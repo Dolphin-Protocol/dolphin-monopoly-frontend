@@ -1,18 +1,52 @@
 "use client";
-import { useState } from "react";
-import Player from "./Player";
+import { useState, useEffect, useRef } from "react";
 import DiceRoll from "./DiceRoll";
+import Cell from "./Cell";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const GameBoard = () => {
 	const [playerPosition, setPlayerPosition] = useState(0);
 	const [isRolling, setIsRolling] = useState(false);
 	const [lastRoll, setLastRoll] = useState<number | null>(null);
+	const [initialScale, setInitialScale] = useState(1);
+	const transformComponentRef = useRef(null);
+
+	useEffect(() => {
+		const calculateInitialScale = () => {
+			const screenWidth = window.innerWidth;
+			const screenHeight = window.innerHeight;
+			const mapSize = 1200; // our map size
+
+			// Calculate scale needed for both dimensions
+			const scaleX = (screenWidth / mapSize) * 1.2; // Add 20% extra zoom
+			const scaleY = (screenHeight / mapSize) * 1.2;
+
+			// Use the larger scale to ensure map fills screen
+			setInitialScale(Math.max(scaleX, scaleY));
+		};
+
+		calculateInitialScale();
+
+		// Force initial zoom after a short delay to ensure component is mounted
+		setTimeout(() => {
+			if (transformComponentRef.current) {
+				// @ts-ignore: Object is possibly 'null'
+				transformComponentRef.current.setTransform(0, 0, initialScale);
+			}
+		}, 100);
+
+		window.addEventListener("resize", calculateInitialScale);
+
+		return () => {
+			window.removeEventListener("resize", calculateInitialScale);
+		};
+	}, [initialScale]);
 
 	const handleDiceRoll = (value: number) => {
 		setIsRolling(true);
 		setLastRoll(value);
 
-		setPlayerPosition((prev) => (prev + value) % 16);
+		setPlayerPosition((prev) => (prev + value) % 28); // Updated for 8x8 board (28 edge cells)
 
 		setTimeout(() => {
 			setIsRolling(false);
@@ -20,69 +54,34 @@ const GameBoard = () => {
 	};
 
 	const renderCell = (index: number) => {
-		const row = Math.floor(index / 5);
-		const col = index % 5;
-		const isEdgeCell = row === 0 || row === 4 || col === 0 || col === 4;
-
-		// Convert grid position to clockwise number (0-15 for edge cells)
-		const getClockwiseNumber = (row: number, col: number) => {
-			if (row === 0) return col;
-			if (col === 4) return row + 4;
-			if (row === 4) return 12 - col;
-			if (col === 0) return 16 - row;
-			return -1; // Non-edge cells
-		};
-
-		const clockwiseNumber = getClockwiseNumber(row, col);
-
-		return (
-			<div
-				key={index}
-				className={`relative ${
-					isEdgeCell
-						? "bg-white border border-gray-300 flex items-center justify-center text-xl"
-						: ""
-				}`}
-			>
-				{isEdgeCell ? clockwiseNumber : ""}
-				{isEdgeCell && playerPosition === clockwiseNumber && (
-					<div
-						style={{
-							position: "absolute",
-							left: "50%",
-							top: "50%",
-						}}
-					>
-						<Player position={playerPosition} />
-					</div>
-				)}
-			</div>
-		);
+		return <Cell key={index} index={index} />;
 	};
 
 	return (
-		<div className="flex gap-8 justify-between items-center w-full p-8">
-			<div className="flex flex-col gap-6">
-				<DiceRoll onRoll={handleDiceRoll} disabled={isRolling} />
-				{lastRoll && (
-					<div className="bg-white px-4 py-3 rounded-lg shadow-md">
-						<div className="text-gray-500 text-md mb-1 font-semibold">
-							Last Roll
-						</div>
-						<div className="text-2xl font-bold text-blue-600">
-							{lastRoll}
+		<div className="w-screen h-screen bg-blue-100">
+			<TransformWrapper
+				ref={transformComponentRef}
+				initialScale={initialScale}
+				minScale={initialScale}
+				maxScale={3}
+				centerOnInit={true}
+				limitToBounds={true}
+			>
+				<TransformComponent
+					wrapperStyle={{
+						width: "100%",
+						height: "100%",
+					}}
+				>
+					<div className="relative w-[1200px] h-[1200px]">
+						<div className="absolute inset-0 grid grid-cols-8 grid-rows-8 gap-1">
+							{Array.from({ length: 64 }).map((_, index) =>
+								renderCell(index)
+							)}
 						</div>
 					</div>
-				)}
-			</div>
-
-			<div className="relative w-[800px] h-[800px] bg-blue-100">
-				<div className="absolute inset-0 grid grid-cols-5 grid-rows-5 gap-1">
-					{Array.from({ length: 25 }).map((_, index) =>
-						renderCell(index)
-					)}
-				</div>
-			</div>
+				</TransformComponent>
+			</TransformWrapper>
 		</div>
 	);
 };
