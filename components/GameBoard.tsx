@@ -4,24 +4,17 @@ import {
 	TransformComponent,
 	ReactZoomPanPinchRef,
 } from "react-zoom-pan-pinch";
-import Cell from "./Cell";
+import Cell from "./cells";
 import MiniMap from "./MiniMap";
 import { useRef } from "react";
+import { createBoardData } from "@/utils/board";
 
 const GameBoard = () => {
 	const transformComponentRef = useRef<ReactZoomPanPinchRef>(null);
+	const boardData = createBoardData();
 
-	const handleMiniMapClick = (index: number) => {
-		if (!transformComponentRef.current) return;
-
-		const row = Math.floor(index / 8);
-		const col = index % 8;
-
-		const cellWidth = 1200 / 8;
-		const x = -(col * cellWidth + cellWidth / 2 - window.innerWidth / 2);
-		const y = -(row * cellWidth + cellWidth / 2 - window.innerHeight / 2);
-
-		transformComponentRef.current.setTransform(x, y, 1);
+	const renderCell = (index: number) => {
+		return <Cell key={index} data={boardData[index]} />;
 	};
 
 	const handleZoom = (zoomIn: boolean) => {
@@ -32,13 +25,6 @@ const GameBoard = () => {
 		} else {
 			transformComponentRef.current.zoomOut();
 		}
-	};
-
-	const handleZoomIn = () => handleZoom(true);
-	const handleZoomOut = () => handleZoom(false);
-
-	const renderCell = (index: number) => {
-		return <Cell key={index} index={index} />;
 	};
 
 	return (
@@ -68,9 +54,9 @@ const GameBoard = () => {
 			</TransformWrapper>
 
 			<MiniMap
-				onCellClick={handleMiniMapClick}
-				onZoomIn={handleZoomIn}
-				onZoomOut={handleZoomOut}
+				onCellClick={(index) => {}}
+				onZoomIn={() => handleZoom(true)}
+				onZoomOut={() => handleZoom(false)}
 			/>
 		</div>
 	);
