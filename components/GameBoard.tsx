@@ -1,57 +1,41 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import DiceRoll from "./DiceRoll";
+import {
+	TransformWrapper,
+	TransformComponent,
+	ReactZoomPanPinchRef,
+} from "react-zoom-pan-pinch";
 import Cell from "./Cell";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import MiniMap from "./MiniMap";
+import { useRef } from "react";
 
 const GameBoard = () => {
-	const [playerPosition, setPlayerPosition] = useState(0);
-	const [isRolling, setIsRolling] = useState(false);
-	const [lastRoll, setLastRoll] = useState<number | null>(null);
-	const [initialScale, setInitialScale] = useState(1);
-	const transformComponentRef = useRef(null);
+	const transformComponentRef = useRef<ReactZoomPanPinchRef>(null);
 
-	useEffect(() => {
-		const calculateInitialScale = () => {
-			const screenWidth = window.innerWidth;
-			const screenHeight = window.innerHeight;
-			const mapSize = 1200; // our map size
+	const handleMiniMapClick = (index: number) => {
+		if (!transformComponentRef.current) return;
 
-			// Calculate scale needed for both dimensions
-			const scaleX = (screenWidth / mapSize) * 1.2; // Add 20% extra zoom
-			const scaleY = (screenHeight / mapSize) * 1.2;
+		const row = Math.floor(index / 8);
+		const col = index % 8;
 
-			// Use the larger scale to ensure map fills screen
-			setInitialScale(Math.max(scaleX, scaleY));
-		};
+		const cellWidth = 1200 / 8;
+		const x = -(col * cellWidth + cellWidth / 2 - window.innerWidth / 2);
+		const y = -(row * cellWidth + cellWidth / 2 - window.innerHeight / 2);
 
-		calculateInitialScale();
-
-		// Force initial zoom after a short delay to ensure component is mounted
-		setTimeout(() => {
-			if (transformComponentRef.current) {
-				// @ts-ignore: Object is possibly 'null'
-				transformComponentRef.current.setTransform(0, 0, initialScale);
-			}
-		}, 100);
-
-		window.addEventListener("resize", calculateInitialScale);
-
-		return () => {
-			window.removeEventListener("resize", calculateInitialScale);
-		};
-	}, [initialScale]);
-
-	const handleDiceRoll = (value: number) => {
-		setIsRolling(true);
-		setLastRoll(value);
-
-		setPlayerPosition((prev) => (prev + value) % 28); // Updated for 8x8 board (28 edge cells)
-
-		setTimeout(() => {
-			setIsRolling(false);
-		}, 1000);
+		transformComponentRef.current.setTransform(x, y, 1);
 	};
+
+	const handleZoom = (zoomIn: boolean) => {
+		if (!transformComponentRef.current) return;
+
+		if (zoomIn) {
+			transformComponentRef.current.zoomIn();
+		} else {
+			transformComponentRef.current.zoomOut();
+		}
+	};
+
+	const handleZoomIn = () => handleZoom(true);
+	const handleZoomOut = () => handleZoom(false);
 
 	const renderCell = (index: number) => {
 		return <Cell key={index} index={index} />;
@@ -61,8 +45,8 @@ const GameBoard = () => {
 		<div className="w-screen h-screen bg-blue-100">
 			<TransformWrapper
 				ref={transformComponentRef}
-				initialScale={initialScale}
-				minScale={initialScale}
+				initialScale={1}
+				minScale={0.5}
 				maxScale={3}
 				centerOnInit={true}
 				limitToBounds={true}
@@ -82,6 +66,12 @@ const GameBoard = () => {
 					</div>
 				</TransformComponent>
 			</TransformWrapper>
+
+			<MiniMap
+				onCellClick={handleMiniMapClick}
+				onZoomIn={handleZoomIn}
+				onZoomOut={handleZoomOut}
+			/>
 		</div>
 	);
 };
