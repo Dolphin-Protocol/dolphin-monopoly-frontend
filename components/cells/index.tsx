@@ -4,6 +4,7 @@ import StartCell from "./StartCell";
 import PropertyCell from "./PropertyCell";
 import JailCell from "./JailCell";
 import ChanceCell from "./ChanceCell";
+import BaseCell from "./BaseCell";
 
 interface CellProps {
 	data: CellData;
@@ -20,7 +21,7 @@ const Cell = ({ data }: CellProps) => {
 		case CellType.CHANCE:
 			return <ChanceCell data={data} />;
 		default:
-			return <div className="bg-gray-100" />;
+			return <BaseCell data={data} />;
 	}
 };
 

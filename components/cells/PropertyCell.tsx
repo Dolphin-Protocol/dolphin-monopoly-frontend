@@ -3,9 +3,9 @@ import { CellData } from "@/types/cell";
 
 const PropertyCell = ({ data }: { data: CellData }) => {
 	return (
-		<div className="w-full h-full relative border border-gray-300">
+		<div className="w-full h-full relative">
 			<Image
-				src="/cells/level-zero-ground.png"
+				src="/cells/level-one-ground.png"
 				alt="Property"
 				fill
 				className="object-cover"

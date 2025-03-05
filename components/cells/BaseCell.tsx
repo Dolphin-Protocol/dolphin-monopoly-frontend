@@ -1,16 +1,20 @@
+import Image from "next/image";
 import { CellData } from "@/types/cell";
 
 interface BaseCellProps {
 	data: CellData;
-	isEdgeCell: boolean;
 }
 
-const BaseCell = ({ data, isEdgeCell }: BaseCellProps) => {
-	if (!isEdgeCell) return <div className="bg-gray-100" />;
+const BaseCell = ({ data }: BaseCellProps) => {
 
 	return (
-		<div className="bg-white border border-gray-300 flex items-center justify-center">
-			<span className="text-sm">{data.position}</span>
+		<div className="w-full h-full relative">
+			<Image
+				src="/cells/normal.png"
+				alt="Normal"
+				fill
+				className="object-cover"
+			/>
 		</div>
 	);
 };

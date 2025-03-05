@@ -3,7 +3,7 @@ import { CellData } from "@/types/cell";
 
 const StartCell = ({ data }: { data: CellData }) => {
 	return (
-		<div className="w-full h-full relative border border-gray-300">
+		<div className="w-full h-full relative">
 			<Image
 				src="/cells/start.png"
 				alt="Start"
