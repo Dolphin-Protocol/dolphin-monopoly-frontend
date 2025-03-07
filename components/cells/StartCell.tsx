@@ -5,7 +5,7 @@ const StartCell = ({ data }: { data: CellData }) => {
 	return (
 		<div className="w-full h-full relative">
 			<Image
-				src="/cells/start.png"
+				src="/cells/start-high.png"
 				alt="Start"
 				fill
 				className="object-cover"

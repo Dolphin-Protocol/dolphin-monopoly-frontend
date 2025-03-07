@@ -42,13 +42,13 @@ const GameBoard = () => {
 	};
 
 	return (
-		<div className="w-screen h-screen bg-blue-100">
+		<div className="w-screen h-screen bg-[#84c669]">
 			<TransformWrapper
 				ref={transformComponentRef}
-				initialScale={1}
+				initialScale={2}
 				minScale={0.5}
-				maxScale={3}
-				centerOnInit={true}
+				maxScale={2}
+				centerOnInit={false}
 				limitToBounds={true}
 			>
 				<TransformComponent
@@ -58,7 +58,7 @@ const GameBoard = () => {
 					}}
 				>
 					<div className="relative w-[1200px] h-[1200px]">
-						<div className="absolute inset-0 grid grid-cols-8 grid-rows-8">
+						<div className="absolute inset-0 grid grid-cols-8 grid-rows-8 gap-6">
 							{Array.from({ length: 64 }).map((_, index) =>
 								renderCell(index)
 							)}

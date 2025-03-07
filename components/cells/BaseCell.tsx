@@ -10,7 +10,7 @@ const BaseCell = ({ data }: BaseCellProps) => {
 	return (
 		<div className="w-full h-full relative">
 			<Image
-				src="/cells/normal.png"
+				src="/cells/normal-high.png"
 				alt="Normal"
 				fill
 				className="object-cover"

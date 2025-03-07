@@ -5,7 +5,7 @@ const JailCell = ({ data }: { data: CellData }) => {
 	return (
 		<div className="w-full h-full relative">
 			<Image
-				src="/cells/jail.png"
+				src="/cells/jail-high.png"
 				alt="Jail"
 				fill
 				className="object-cover"

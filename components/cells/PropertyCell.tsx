@@ -5,7 +5,7 @@ const PropertyCell = ({ data }: { data: CellData }) => {
 	return (
 		<div className="w-full h-full relative">
 			<Image
-				src="/cells/level-one-ground.png"
+				src="/cells/level-zero-ground-high.png"
 				alt="Property"
 				fill
 				className="object-cover"

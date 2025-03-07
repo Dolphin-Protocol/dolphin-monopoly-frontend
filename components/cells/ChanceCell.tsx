@@ -5,7 +5,7 @@ const ChanceCell = ({ data }: { data: CellData }) => {
 	return (
 		<div className="w-full h-full relative">
 			<Image
-				src="/cells/chance.png"
+				src="/cells/chance-high.png"
 				alt="Chance"
 				fill
 				className="object-cover"
