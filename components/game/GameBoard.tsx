@@ -4,10 +4,11 @@ import {
 	TransformComponent,
 	ReactZoomPanPinchRef,
 } from "react-zoom-pan-pinch";
-import Cell from "./cells";
-import MiniMap from "./MiniMap";
+
 import { useRef } from "react";
 import { createBoardData } from "@/utils/board";
+import Cell from "../cells";
+import MiniMap from "./MiniMap";
 
 const GameBoard = () => {
 	const transformComponentRef = useRef<ReactZoomPanPinchRef>(null);
@@ -58,7 +59,7 @@ const GameBoard = () => {
 					}}
 				>
 					<div className="relative w-[1200px] h-[1200px]">
-						<div className="absolute inset-0 grid grid-cols-8 grid-rows-8 gap-6">
+						<div className="absolute inset-0 grid grid-cols-8 grid-rows-8 gap-2">
 							{Array.from({ length: 64 }).map((_, index) =>
 								renderCell(index)
 							)}

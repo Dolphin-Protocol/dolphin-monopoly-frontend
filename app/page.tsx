@@ -1,9 +1,7 @@
-import GameBoard from "../components/GameBoard";
+"use client";
 
-export default function Home() {
-	return (
-		<main className="flex min-h-screen items-center justify-center">
-			<GameBoard />
-		</main>
-	);
+import GameLobby from "@/components/lobby/GameLobby";
+
+export default function LobbyPage() {
+	return <GameLobby />;
 }
