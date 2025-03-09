@@ -46,7 +46,7 @@ const GameBoard = () => {
 		<div className="w-screen h-screen bg-[#84c669]">
 			<TransformWrapper
 				ref={transformComponentRef}
-				initialScale={2}
+				initialScale={1}
 				minScale={0.5}
 				maxScale={2}
 				centerOnInit={false}
