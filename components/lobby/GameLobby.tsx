@@ -15,10 +15,8 @@ export default function GameLobby() {
 		isConnecting,
 		isConnected,
 		connectionError,
-		socketId,
 		rooms: serverRooms,
 		createRoom,
-		disconnect,
 	} = useLobby();
 
 	const [searchQuery, setSearchQuery] = useState("");
@@ -32,6 +30,8 @@ export default function GameLobby() {
 			setUseFallbackData(true);
 		}
 	}, [isConnecting, isConnected]);
+
+	console.log("isConnected", isConnected);
 
 	// Use mock data if server connection fails, if showMockData is true, or if useFallbackData is true
 	const rooms =
@@ -52,37 +52,12 @@ export default function GameLobby() {
 		try {
 			setIsCreatingRoom(true);
 			// Generate a random address
-			const address = `player_${Math.random()
-				.toString(36)
-				.substring(2, 8)}`;
+			const address = "0x1234567890123456789012345678901234567890";
 
-			if (showMockData || !isConnected || useFallbackData) {
-				// Simulate room creation with mock data
-				setTimeout(() => {
-					const roomId = `ROOM${Math.random()
-						.toString(36)
-						.substring(2, 8)
-						.toUpperCase()}`;
-					router.push(`/game/${roomId}`);
-				}, 1000);
-			} else {
-				// Create room using the API
-				const result = await createRoom(address);
-				if (result.roomId) {
-					router.push(`/game/${result.roomId}`);
-				}
-			}
+			const result = await createRoom(address);
+			console.log("result", result);
 		} catch (error) {
 			console.error("Failed to create room:", error);
-			// If room creation fails, use mock data as fallback
-			setUseFallbackData(true);
-			setTimeout(() => {
-				const roomId = `ROOM${Math.random()
-					.toString(36)
-					.substring(2, 8)
-					.toUpperCase()}`;
-				router.push(`/game/${roomId}`);
-			}, 1000);
 		} finally {
 			setIsCreatingRoom(false);
 		}

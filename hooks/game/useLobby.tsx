@@ -1,14 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-	initializeSocket,
-	isSocketConnected,
-	getSocket,
-	disconnectSocket,
-	createRoom as createRoomApi,
-	startRoomsListener,
-	addRoomsListener,
-	clearRoomsListeners,
-} from "@/socket/gameSocket";
+import { socket } from "@/socket/gameSocket";
 import { Room } from "@/types/game";
 
 interface UseLobbyReturn {
@@ -21,97 +12,71 @@ interface UseLobbyReturn {
 	disconnect: () => void;
 }
 
-/**
- * Lobby Hook for game room management
- * @returns Lobby functionality
- */
 export const useLobby = (): UseLobbyReturn => {
-	const [isConnecting, setIsConnecting] = useState<boolean>(true);
+	const [isConnecting, setIsConnecting] = useState<boolean>(false);
 	const [isConnected, setIsConnected] = useState<boolean>(false);
 	const [connectionError, setConnectionError] = useState<string>("");
 	const [socketId, setSocketId] = useState<string>("");
 	const [rooms, setRooms] = useState<Room[]>([]);
 
-	// Initialize Socket connection
 	useEffect(() => {
-		const connectToServer = async () => {
-			try {
-				setIsConnecting(true);
-				setConnectionError("");
+		setIsConnecting(true);
+		socket.connect();
 
-				const result = await initializeSocket();
+		socket.on("connect", () => {
+			setIsConnecting(false);
+			setIsConnected(true);
+			setSocketId(socket.id || "");
+			setConnectionError("");
+			console.log("Connected to WebSocket Server:", socket.id);
+		});
 
-				if (result.success) {
-					setIsConnected(true);
-					setSocketId(result.socket?.id || "");
-				} else {
-					setIsConnected(false);
-					setConnectionError(result.message);
-				}
-			} catch (error) {
-				setIsConnected(false);
-				setConnectionError(
-					error instanceof Error ? error.message : "Connection failed"
-				);
-			} finally {
-				setIsConnecting(false);
-			}
-		};
+		socket.on("disconnect", () => {
+			setIsConnected(false);
+			setSocketId("");
+			console.log("Disconnected from WebSocket Server");
+		});
 
-		connectToServer();
+		socket.on("rooms", (data) => {
+			console.log("Received rooms:", data.rooms);
+			setRooms(data.rooms);
+		});
 
-		// Cleanup socket on unmount
+		socket.on("connect_error", (error) => {
+			setIsConnecting(false);
+			setConnectionError(error.message);
+			console.error("WebSocket Connection Error:", error);
+		});
+
 		return () => {
-			disconnectSocket();
+			socket.off("connect");
+			socket.off("disconnect");
+			socket.off("rooms");
+			socket.off("connect_error");
 		};
 	}, []);
 
-	// Set up room listeners once connected
-	useEffect(() => {
-		// Only set up listeners if connected
-		if (isConnected && !isConnecting) {
-			console.log("Setting up room listeners");
-
-			// Start listening for rooms
-			startRoomsListener();
-
-			// Add room data change listener
-			const removeListener = addRoomsListener((roomList) => {
-				console.log("Room list updated:", roomList);
-				setRooms(roomList);
-			});
-
-			// Cleanup room listeners
-			return () => {
-				console.log("Cleaning up room listeners");
-				removeListener();
-				clearRoomsListeners();
-			};
-		}
-	}, [isConnected, isConnecting]);
-
-	// Create room
 	const createRoom = useCallback(
-		async (address: string): Promise<{ roomId: string }> => {
-			try {
-				const response = await createRoomApi(address);
-				return { roomId: response.roomId };
-			} catch (error) {
-				throw new Error(
-					error instanceof Error
-						? error.message
-						: "Failed to create room"
-				);
-			}
+		(address: string): Promise<{ roomId: string }> => {
+			return new Promise((resolve, reject) => {
+				if (!isConnected) {
+					reject(new Error("WebSocket is not connected"));
+					return;
+				}
+
+				socket.emit("createRoom", { address });
+
+				socket.once("roomCreated", (data) => {
+					console.log("Room created:", data);
+					resolve(data);
+				});
+			});
 		},
-		[]
+		[isConnected]
 	);
 
-	// Disconnect
-	const disconnect = useCallback((): void => {
-		disconnectSocket();
-		setIsConnected(false);
-		setSocketId("");
+	const disconnect = useCallback(() => {
+		socket.disconnect();
 	}, []);
 
 	return {
