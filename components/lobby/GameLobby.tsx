@@ -10,6 +10,7 @@ import { RoomList } from "./RoomList";
 
 export default function GameLobby() {
 	const router = useRouter();
+	
 	const {
 		isConnecting,
 		isConnected,
