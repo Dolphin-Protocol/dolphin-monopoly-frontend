@@ -49,10 +49,7 @@ export const useLobby = (): UseLobbyReturn => {
 		});
 
 		return () => {
-			socket.off("connect");
-			socket.off("disconnect");
 			socket.off("rooms");
-			socket.off("connect_error");
 		};
 	}, []);
 

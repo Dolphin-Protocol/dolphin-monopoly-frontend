@@ -21,22 +21,22 @@ export function RoomCard({ room, onJoin }: RoomCardProps) {
 		<Card className="overflow-hidden transition-all hover:shadow-md">
 			<CardHeader className="pb-2">
 				<div className="flex justify-between items-start">
-					<CardTitle className="text-lg">{room.name}</CardTitle>
+					<CardTitle className="text-lg">{room.roomId}</CardTitle>
 					<Badge
 						variant={
-							room.status === "playing" ? "secondary" : "default"
+							room.isCreator ? "secondary" : "default"
 						}
 					>
-						{room.status}
+						{room.isCreator ? "Host" : "Player"}
 					</Badge>
 				</div>
-				<CardDescription>Host: {room.creator}</CardDescription>
+				<CardDescription>Host: {room.address}</CardDescription>
 			</CardHeader>
 			<CardContent className="pb-2">
 				<div className="flex justify-between text-sm text-muted-foreground">
 					<div className="flex items-center">
 						<Users className="mr-1 h-4 w-4" />
-						{room.players.length} Players
+						{room.members.length} Players
 					</div>
 					<div className="flex items-center">
 						<Clock className="mr-1 h-4 w-4" />
@@ -46,12 +46,11 @@ export function RoomCard({ room, onJoin }: RoomCardProps) {
 			</CardContent>
 			<CardFooter className="pt-2 flex justify-between">
 				<Badge variant="outline">
-					{room.status === "waiting" ? "Open" : "In Progress"}
+					{room.members.length} Players
 				</Badge>
 				<Button
 					variant="secondary"
 					size="sm"
-					disabled={room.status === "playing"}
 					onClick={() => onJoin(room.id)}
 				>
 					Join

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLobby } from "@/hooks/game/useLobby";
-import { mockRooms } from "@/mock/rooms";
 import { LobbyHeader } from "./LobbyHeader";
 import { SearchBar } from "./SearchBar";
 import { RoomList } from "./RoomList";
@@ -31,19 +30,11 @@ export default function GameLobby() {
 		}
 	}, [isConnecting, isConnected]);
 
-	console.log("isConnected", isConnected);
-
-	// Use mock data if server connection fails, if showMockData is true, or if useFallbackData is true
-	const rooms =
-		showMockData || !isConnected || useFallbackData
-			? mockRooms
-			: serverRooms;
-
 	// Filter and search rooms
-	const filteredRooms = rooms.filter((room) => {
+	const filteredRooms = serverRooms.filter((room) => {
 		const matchesSearch =
-			room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			room.creator.toLowerCase().includes(searchQuery.toLowerCase());
+			room.roomId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			room.address.toLowerCase().includes(searchQuery.toLowerCase());
 		return matchesSearch;
 	});
 
