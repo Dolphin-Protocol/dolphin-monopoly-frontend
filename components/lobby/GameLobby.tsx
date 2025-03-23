@@ -10,7 +10,7 @@ import { RoomList } from "./RoomList";
 
 export default function GameLobby() {
 	const router = useRouter();
-	
+
 	const {
 		isConnecting,
 		isConnected,
@@ -18,7 +18,6 @@ export default function GameLobby() {
 		socketId,
 		rooms: serverRooms,
 		createRoom,
-		getRooms,
 		disconnect,
 	} = useLobby();
 
@@ -89,21 +88,9 @@ export default function GameLobby() {
 		}
 	};
 
-	// Handle room refresh
-	const handleRefreshRooms = async () => {
-		if (isConnected && !showMockData && !useFallbackData) {
-			try {
-				await getRooms();
-			} catch (error) {
-				console.error("Failed to refresh rooms:", error);
-				setUseFallbackData(true);
-			}
-		} else {
-			// Just toggle mock data to simulate refresh
-			const currentMockData = [...mockRooms];
-			setShowMockData((prev) => !prev);
-			setTimeout(() => setShowMockData((prev) => !prev), 100);
-		}
+	// Handle room refresh - simplified as rooms update automatically
+	const handleRefreshRooms = () => {
+		window.location.reload();
 	};
 
 	// Handle joining a room

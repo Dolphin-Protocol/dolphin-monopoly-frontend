@@ -5,9 +5,9 @@ import {
 	getSocket,
 	disconnectSocket,
 	createRoom as createRoomApi,
-	getRooms as getRoomsApi,
-	onRoomsUpdated,
-	offEvent,
+	startRoomsListener,
+	addRoomsListener,
+	clearRoomsListeners,
 } from "@/socket/gameSocket";
 import { Room } from "@/types/game";
 
@@ -18,7 +18,6 @@ interface UseLobbyReturn {
 	socketId: string;
 	rooms: Room[];
 	createRoom: (address: string) => Promise<{ roomId: string }>;
-	getRooms: () => Promise<void>;
 	disconnect: () => void;
 }
 
@@ -45,9 +44,6 @@ export const useLobby = (): UseLobbyReturn => {
 				if (result.success) {
 					setIsConnected(true);
 					setSocketId(result.socket?.id || "");
-
-					// Get room list
-					await getRoomsInternal();
 				} else {
 					setIsConnected(false);
 					setConnectionError(result.message);
@@ -64,30 +60,41 @@ export const useLobby = (): UseLobbyReturn => {
 
 		connectToServer();
 
-		// Listen for room list updates
-		const socket = getSocket();
-		if (socket) {
-			socket.on("roomsUpdated", (roomList) => {
-				setRooms(roomList);
-			});
-		}
-
-		// Cleanup function
+		// Cleanup socket on unmount
 		return () => {
-			offEvent("roomsUpdated");
 			disconnectSocket();
 		};
 	}, []);
+
+	// Set up room listeners once connected
+	useEffect(() => {
+		// Only set up listeners if connected
+		if (isConnected && !isConnecting) {
+			console.log("Setting up room listeners");
+
+			// Start listening for rooms
+			startRoomsListener();
+
+			// Add room data change listener
+			const removeListener = addRoomsListener((roomList) => {
+				console.log("Room list updated:", roomList);
+				setRooms(roomList);
+			});
+
+			// Cleanup room listeners
+			return () => {
+				console.log("Cleaning up room listeners");
+				removeListener();
+				clearRoomsListeners();
+			};
+		}
+	}, [isConnected, isConnecting]);
 
 	// Create room
 	const createRoom = useCallback(
 		async (address: string): Promise<{ roomId: string }> => {
 			try {
 				const response = await createRoomApi(address);
-
-				// Update room list after creating a room
-				await getRoomsInternal();
-
 				return { roomId: response.roomId };
 			} catch (error) {
 				throw new Error(
@@ -99,39 +106,6 @@ export const useLobby = (): UseLobbyReturn => {
 		},
 		[]
 	);
-
-	// Get room list (internal use)
-	const getRoomsInternal = useCallback(async (): Promise<void> => {
-		try {
-			// Use API approach to get rooms
-			const socket = getSocket();
-			if (!socket) {
-				throw new Error("Not connected to game server");
-			}
-
-			// Use a Promise-based approach with the socket
-			const response = await new Promise<any>((resolve, reject) => {
-				socket.emit("getRooms", {}, (res: any) => {
-					if (res && res.success) {
-						resolve(res);
-					} else {
-						reject(
-							new Error(res?.message || "Failed to get room list")
-						);
-					}
-				});
-			});
-
-			setRooms(response.rooms || []);
-		} catch (error) {
-			console.error("Error getting room list:", error);
-		}
-	}, []);
-
-	// Get room list (external use)
-	const getRooms = useCallback(async (): Promise<void> => {
-		return getRoomsInternal();
-	}, [getRoomsInternal]);
 
 	// Disconnect
 	const disconnect = useCallback((): void => {
@@ -147,7 +121,6 @@ export const useLobby = (): UseLobbyReturn => {
 		socketId,
 		rooms,
 		createRoom,
-		getRooms,
 		disconnect,
 	};
 };

@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AuthenticationContextProps, UserProps } from "@/types/wallet/auth";

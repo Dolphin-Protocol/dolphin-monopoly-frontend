@@ -1,13 +1,17 @@
 import { io, Socket } from "socket.io-client";
 
 // Default Socket server URL
-const DEFAULT_BACKEND_URL = "http://192.168.68.146:3000";
+const DEFAULT_BACKEND_URL = "http://5.183.11.9:3003";
 
 // Socket connection instance
 let socket: Socket | null = null;
 
 // Connection status
 let isConnected = false;
+
+// Room data and listeners
+let currentRooms: any[] = [];
+const roomListeners: ((rooms: any[]) => void)[] = [];
 
 /**
  * Initialize Socket connection
@@ -243,6 +247,71 @@ export const leaveRoom = (roomId: string): Promise<any> => {
 };
 
 /**
+ * Start listening for room updates
+ */
+export const startRoomsListener = (): void => {
+	if (!socket || !isSocketConnected()) return;
+
+	// Clear previous listeners
+	socket.off("rooms");
+
+	// Set new listener
+	socket.on("rooms", (data) => {
+		console.log("Received rooms event:", data);
+		currentRooms = data.rooms || [];
+
+		// Notify all listeners
+		notifyRoomsListeners();
+	});
+};
+
+/**
+ * Add room data change listener
+ * @param listener Listener function
+ * @returns Function to remove the listener
+ */
+export const addRoomsListener = (
+	listener: (rooms: any[]) => void
+): (() => void) => {
+	roomListeners.push(listener);
+
+	// Notify with current data if available
+	if (currentRooms.length > 0) {
+		listener(currentRooms);
+	}
+
+	return () => removeRoomsListener(listener);
+};
+
+/**
+ * Remove room data change listener
+ * @param listener Listener to remove
+ */
+export const removeRoomsListener = (listener: (rooms: any[]) => void): void => {
+	const index = roomListeners.indexOf(listener);
+	if (index !== -1) {
+		roomListeners.splice(index, 1);
+	}
+};
+
+/**
+ * Notify all room listeners
+ */
+const notifyRoomsListeners = (): void => {
+	roomListeners.forEach((listener) => listener([...currentRooms]));
+};
+
+/**
+ * Clear all room listeners
+ */
+export const clearRoomsListeners = (): void => {
+	roomListeners.length = 0;
+	if (socket) {
+		socket.off("rooms");
+	}
+};
+
+/**
  * Get room list
  * @returns Room list Promise
  */
@@ -253,15 +322,27 @@ export const getRooms = (): Promise<any> => {
 			return;
 		}
 
-		socket?.emit("getRooms", {}, (response: any) => {
-			if (response.success) {
+		const timeout = setTimeout(() => {
+			socket?.off("rooms", handleRooms);
+			reject(new Error("Get rooms timeout"));
+		}, 5000);
+
+		const handleRooms = (response: any) => {
+			clearTimeout(timeout);
+			socket?.off("rooms", handleRooms);
+
+			if (response && response.success) {
+				console.log("Rooms:", response);
 				resolve(response);
 			} else {
 				reject(
-					new Error(response.message || "Failed to get room list")
+					new Error(response?.message || "Failed to get room list")
 				);
 			}
-		});
+		};
+
+		socket?.on("rooms", handleRooms);
+		socket?.emit("getRooms", {});
 	});
 };
 

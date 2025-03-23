@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Transaction } from "@mysten/sui/transactions";
 import {
