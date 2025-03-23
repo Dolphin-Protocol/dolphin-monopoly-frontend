@@ -1,11 +1,11 @@
 "use client";
 
-import MonopolyBoard3D from "@/components/MonopolyBoard3D";
+import Board from "@/components/3d/Board";
 
 export default function Monopoly3DPage() {
 	return (
 		<div className="w-screen h-screen">
-			<MonopolyBoard3D />
+			<Board />
 		</div>
 	);
 }

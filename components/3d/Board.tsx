@@ -528,7 +528,7 @@ const InfiniteGround = () => {
 };
 
 // Function component that adapts to React Three Fiber pattern
-const MonopolyBoard3D = () => {
+const Board = () => {
 	// Simulated player data
 	const [players, setPlayers] = useState<Player[]>([
 		{
@@ -681,4 +681,4 @@ const MonopolyBoard3D = () => {
 	);
 };
 
-export default MonopolyBoard3D;
+export default Board;
