@@ -24,13 +24,13 @@ export function RoomCard({ room, onJoin }: RoomCardProps) {
 					<CardTitle className="text-lg">{room.roomId}</CardTitle>
 					<Badge
 						variant={
-							room.isCreator ? "secondary" : "default"
+							room.members[0].isCreator ? "secondary" : "default"
 						}
 					>
-						{room.isCreator ? "Host" : "Player"}
+						{room.members[0].isCreator ? "Host" : "Player"}
 					</Badge>
 				</div>
-				<CardDescription>Host: {room.address}</CardDescription>
+				<CardDescription>Host: {room.members[0].address}</CardDescription>
 			</CardHeader>
 			<CardContent className="pb-2">
 				<div className="flex justify-between text-sm text-muted-foreground">
@@ -51,7 +51,7 @@ export function RoomCard({ room, onJoin }: RoomCardProps) {
 				<Button
 					variant="secondary"
 					size="sm"
-					onClick={() => onJoin(room.id)}
+					onClick={() => onJoin(room.roomId)}
 				>
 					Join
 				</Button>

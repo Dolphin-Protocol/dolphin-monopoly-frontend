@@ -7,15 +7,11 @@ import ProfilePopover from "./ProfilePopover";
 interface LobbyHeaderProps {
 	isConnecting: boolean;
 	isConnected: boolean;
-	showMockData: boolean;
-	onToggleMockData: () => void;
 }
 
 export function LobbyHeader({
 	isConnecting,
 	isConnected,
-	showMockData,
-	onToggleMockData,
 }: LobbyHeaderProps) {
 	return (
 		<header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 w-full">
@@ -26,19 +22,10 @@ export function LobbyHeader({
 					<ConnectionStatus
 						isConnecting={isConnecting}
 						isConnected={isConnected}
-						showMockData={showMockData}
 					/>
 				</div>
 
 				<div className="flex items-center gap-4">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={onToggleMockData}
-					>
-						{showMockData ? "Use Server Data" : "Use Mock Data"}
-					</Button>
-
 					<ProfilePopover />
 				</div>
 			</div>

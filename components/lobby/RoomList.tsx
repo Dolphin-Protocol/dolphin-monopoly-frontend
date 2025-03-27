@@ -6,7 +6,6 @@ interface RoomListProps {
 	rooms: Room[];
 	isConnecting: boolean;
 	isConnected: boolean;
-	showMockData: boolean;
 	connectionError: string;
 	onJoinRoom: (roomId: string) => void;
 }
@@ -15,11 +14,10 @@ export function RoomList({
 	rooms,
 	isConnecting,
 	isConnected,
-	showMockData,
 	connectionError,
 	onJoinRoom,
 }: RoomListProps) {
-	if (!isConnecting && !isConnected && !showMockData) {
+	if (!isConnecting && !isConnected) {
 		return (
 			<div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
 				<div className="flex items-center">
@@ -37,7 +35,7 @@ export function RoomList({
 	}
 
 	// Show loading state
-	if (isConnecting && !showMockData) {
+	if (isConnecting) {
 		return (
 			<div className="flex justify-center items-center py-12">
 				<div className="flex flex-col items-center">
@@ -55,7 +53,7 @@ export function RoomList({
 		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 			{rooms.length > 0 ? (
 				rooms.map((room) => (
-					<RoomCard key={room.id} room={room} onJoin={onJoinRoom} />
+					<RoomCard key={room.roomId} room={room} onJoin={onJoinRoom} />
 				))
 			) : (
 				<div className="col-span-full flex justify-center items-center h-40 text-muted-foreground">

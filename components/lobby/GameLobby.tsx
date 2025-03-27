@@ -20,21 +20,16 @@ export default function GameLobby() {
 
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isCreatingRoom, setIsCreatingRoom] = useState(false);
-	const [showMockData, setShowMockData] = useState(false);
-	const [useFallbackData, setUseFallbackData] = useState(false);
 
-	// Automatically use mock data if connection fails
-	useEffect(() => {
-		if (!isConnecting && !isConnected) {
-			setUseFallbackData(true);
-		}
-	}, [isConnecting, isConnected]);
+	console.log("isConnected", isConnected);
+	console.log("serverRooms", serverRooms);
+	console.log("isConnecting", isConnecting);
 
 	// Filter and search rooms
 	const filteredRooms = serverRooms.filter((room) => {
 		const matchesSearch =
 			room.roomId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			room.address.toLowerCase().includes(searchQuery.toLowerCase());
+			room.members[0].address.toLowerCase().includes(searchQuery.toLowerCase());
 		return matchesSearch;
 	});
 
@@ -64,22 +59,11 @@ export default function GameLobby() {
 		router.push(`/game/${roomId}`);
 	};
 
-	// Toggle between mock data and server data
-	const toggleMockData = () => {
-		setShowMockData((prev) => !prev);
-		// If we're switching to server data and we were using fallback data, reset it
-		if (showMockData && useFallbackData) {
-			setUseFallbackData(false);
-		}
-	};
-
 	return (
 		<div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-background/80 w-full">
 			<LobbyHeader
 				isConnecting={isConnecting}
-				isConnected={isConnected && !useFallbackData}
-				showMockData={showMockData || useFallbackData}
-				onToggleMockData={toggleMockData}
+				isConnected={isConnected}
 			/>
 
 			<main className="flex-1 py-6 w-full px-4">
@@ -92,23 +76,10 @@ export default function GameLobby() {
 						isCreatingRoom={isCreatingRoom}
 					/>
 
-					{useFallbackData && !showMockData && (
-						<div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-md mb-2">
-							<p className="font-medium">
-								Connection to server failed
-							</p>
-							<p className="text-sm">
-								Using mock data instead. You can still browse
-								and interact with the rooms.
-							</p>
-						</div>
-					)}
-
 					<RoomList
 						rooms={filteredRooms}
 						isConnecting={isConnecting}
-						isConnected={isConnected && !useFallbackData}
-						showMockData={showMockData || useFallbackData}
+						isConnected={isConnected}
 						connectionError={connectionError}
 						onJoinRoom={handleJoinRoom}
 					/>

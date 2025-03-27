@@ -4,13 +4,11 @@ import { Badge } from "@/components/ui/badge";
 interface ConnectionStatusProps {
 	isConnecting: boolean;
 	isConnected: boolean;
-	showMockData: boolean;
 }
 
 export function ConnectionStatus({
 	isConnecting,
 	isConnected,
-	showMockData,
 }: ConnectionStatusProps) {
 	if (isConnecting) {
 		return (
@@ -26,16 +24,6 @@ export function ConnectionStatus({
 			<div className="flex items-center text-red-500">
 				<AlertCircle className="h-4 w-4 mr-2" />
 				<span className="text-xs">Offline (Using Mock Data)</span>
-			</div>
-		);
-	}
-
-	if (showMockData) {
-		return (
-			<div className="flex items-center text-blue-500">
-				<Badge variant="outline" className="text-xs">
-					Mock Data
-				</Badge>
 			</div>
 		);
 	}
