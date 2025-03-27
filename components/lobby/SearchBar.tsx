@@ -6,7 +6,6 @@ interface SearchBarProps {
 	searchQuery: string;
 	onSearchChange: (query: string) => void;
 	onCreateRoom: () => void;
-	onRefreshRooms: () => void;
 	isCreatingRoom: boolean;
 }
 
@@ -14,7 +13,6 @@ export function SearchBar({
 	searchQuery,
 	onSearchChange,
 	onCreateRoom,
-	onRefreshRooms,
 	isCreatingRoom,
 }: SearchBarProps) {
 	return (
@@ -47,14 +45,6 @@ export function SearchBar({
 							Create Room
 						</>
 					)}
-				</Button>
-
-				<Button
-					variant="outline"
-					onClick={onRefreshRooms}
-					className="px-2"
-				>
-					<RefreshCw className="h-4 w-4" />
 				</Button>
 			</div>
 		</div>

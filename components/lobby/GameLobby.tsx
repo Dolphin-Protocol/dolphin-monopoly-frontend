@@ -6,9 +6,13 @@ import { useLobby } from "@/hooks/game/useLobby";
 import { LobbyHeader } from "./LobbyHeader";
 import { SearchBar } from "./SearchBar";
 import { RoomList } from "./RoomList";
+import { useCustomWallet } from "@/contexts/WalletContext";
+import { toast } from "sonner";
 
 export default function GameLobby() {
 	const router = useRouter();
+
+	const { address } = useCustomWallet();
 
 	const {
 		isConnecting,
@@ -16,6 +20,7 @@ export default function GameLobby() {
 		connectionError,
 		rooms: serverRooms,
 		createRoom,
+		joinRoom,
 	} = useLobby();
 
 	const [searchQuery, setSearchQuery] = useState("");
@@ -29,34 +34,45 @@ export default function GameLobby() {
 	const filteredRooms = serverRooms.filter((room) => {
 		const matchesSearch =
 			room.roomId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			room.members[0].address.toLowerCase().includes(searchQuery.toLowerCase());
+			room.members[0].address
+				.toLowerCase()
+				.includes(searchQuery.toLowerCase());
 		return matchesSearch;
 	});
 
 	// Handle room creation
 	const handleCreateRoom = async () => {
+		if (!address) {
+			toast.error("Please connect your wallet to create a room");
+			return;
+		}
 		try {
 			setIsCreatingRoom(true);
-			// Generate a random address
-			const address = "0x1234567890123456789012345678901234567890";
 
 			const result = await createRoom(address);
-			console.log("result", result);
+			toast.success("Room created successfully");
 		} catch (error) {
 			console.error("Failed to create room:", error);
+			toast.error("Failed to create room");
 		} finally {
 			setIsCreatingRoom(false);
 		}
 	};
 
-	// Handle room refresh - simplified as rooms update automatically
-	const handleRefreshRooms = () => {
-		window.location.reload();
-	};
-
 	// Handle joining a room
-	const handleJoinRoom = (roomId: string) => {
-		router.push(`/game/${roomId}`);
+	const handleJoinRoom = async (roomId: string) => {
+		console.log("handleJoinRoom", roomId);
+		if (!address) {
+			toast.error("Please connect your wallet to join a room");
+			return;
+		}
+		try {
+			await joinRoom(address, roomId);
+			toast.success("Joined room successfully");
+		} catch (error) {
+			console.error("Failed to join room:", error);
+			toast.error("Failed to join room");
+		}
 	};
 
 	return (
@@ -72,7 +88,6 @@ export default function GameLobby() {
 						searchQuery={searchQuery}
 						onSearchChange={setSearchQuery}
 						onCreateRoom={handleCreateRoom}
-						onRefreshRooms={handleRefreshRooms}
 						isCreatingRoom={isCreatingRoom}
 					/>
 

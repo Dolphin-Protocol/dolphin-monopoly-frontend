@@ -9,6 +9,7 @@ interface UseLobbyReturn {
 	socketId: string;
 	rooms: Room[];
 	createRoom: (address: string) => Promise<{ roomId: string }>;
+	joinRoom: (address: string, roomId: string) => Promise<void>;
 	disconnect: () => void;
 }
 
@@ -72,6 +73,25 @@ export const useLobby = (): UseLobbyReturn => {
 		[isConnected]
 	);
 
+	const joinRoom = useCallback(
+		(address: string, roomId: string): Promise<void> => {
+			return new Promise((resolve, reject) => {
+				if (!isConnected) {
+					reject(new Error("WebSocket is not connected"));
+					return;
+				}
+
+				socket.emit("joinRoom", { address, roomId });
+
+				socket.once("userJoined", (data) => {
+					console.log("User joined:", data);
+					resolve();
+				});
+			});
+		},
+		[isConnected]
+	);
+
 	const disconnect = useCallback(() => {
 		socket.disconnect();
 	}, []);
@@ -83,6 +103,7 @@ export const useLobby = (): UseLobbyReturn => {
 		socketId,
 		rooms,
 		createRoom,
+		joinRoom,
 		disconnect,
 	};
 };
