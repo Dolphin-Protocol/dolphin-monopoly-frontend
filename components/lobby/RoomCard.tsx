@@ -1,4 +1,6 @@
-import { Users, Clock, Copy } from "lucide-react";
+"use client";
+
+import { Users, Clock} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,9 +18,10 @@ import { useCustomWallet } from "@/contexts/WalletContext";
 interface RoomCardProps {
 	room: Room;
 	onJoin: (roomId: string) => void;
+	onLeave: (roomId: string) => void;
 }
 
-export function RoomCard({ room, onJoin }: RoomCardProps) {
+export function RoomCard({ room, onJoin, onLeave }: RoomCardProps) {
 	const { address } = useCustomWallet();
 	return (
 		<Card className="overflow-hidden transition-all hover:shadow-md">
@@ -87,9 +90,11 @@ export function RoomCard({ room, onJoin }: RoomCardProps) {
 			<CardFooter className="pt-2 flex justify-between">
 				<Badge variant="outline">{room.members.length} Players</Badge>
 				{room.members.some((member) => member.address === address) ? (
-					<Badge variant="outline">Joined</Badge>
+					<Button variant="destructive" size="sm" onClick={() => onLeave(room.roomId)}>
+						Leave
+					</Button>
 				) : (
-					<Button variant="secondary" size="sm" onClick={() => onJoin(room.roomId)}>
+					<Button variant="default" size="sm" onClick={() => onJoin(room.roomId)}>
 						Join
 					</Button>
 				)}

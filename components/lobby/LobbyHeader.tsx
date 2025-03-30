@@ -1,7 +1,6 @@
 "use client";
 
-import { Trophy, ChevronDown, User, Settings, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Trophy } from "lucide-react";
 import { ConnectionStatus } from "./ConnectionStatus";
 import ProfilePopover from "./ProfilePopover";
 interface LobbyHeaderProps {
@@ -9,10 +8,7 @@ interface LobbyHeaderProps {
 	isConnected: boolean;
 }
 
-export function LobbyHeader({
-	isConnecting,
-	isConnected,
-}: LobbyHeaderProps) {
+export function LobbyHeader({ isConnecting, isConnected }: LobbyHeaderProps) {
 	return (
 		<header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 w-full">
 			<div className="flex h-16 items-center justify-between py-4 w-full px-4">

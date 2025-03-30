@@ -15,6 +15,7 @@ import clientConfig from "@/configs/clientConfig";
 import "@mysten/dapp-kit/dist/index.css";
 import CustomWalletProvider from "@/contexts/WalletContext";
 import { Toaster } from "@/components/ui/sonner";
+import { SocketProvider } from "@/contexts/SocketContext";
 
 export interface StorageAdapter {
 	setItem(key: string, value: string): Promise<void>;
@@ -64,10 +65,12 @@ export const Provider = ({
 					<EnokiFlowProvider apiKey={clientConfig.ENOKI_API_KEY}>
 						<AuthenticationProvider>
 							<CustomWalletProvider>
-								<main>
-									{children}
-									<Toaster duration={2000} />
-								</main>
+								<SocketProvider>
+									<main>
+										{children}
+										<Toaster duration={2000} />
+									</main>
+								</SocketProvider>
 							</CustomWalletProvider>
 						</AuthenticationProvider>
 					</EnokiFlowProvider>

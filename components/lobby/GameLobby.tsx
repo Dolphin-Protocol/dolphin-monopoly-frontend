@@ -21,14 +21,11 @@ export default function GameLobby() {
 		rooms: serverRooms,
 		createRoom,
 		joinRoom,
+		leaveRoom,
 	} = useLobby();
 
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isCreatingRoom, setIsCreatingRoom] = useState(false);
-
-	console.log("isConnected", isConnected);
-	console.log("serverRooms", serverRooms);
-	console.log("isConnecting", isConnecting);
 
 	// Filter and search rooms
 	const filteredRooms = serverRooms.filter((room) => {
@@ -75,6 +72,21 @@ export default function GameLobby() {
 		}
 	};
 
+	const handleLeaveRoom = async (roomId: string) => {
+		console.log("handleLeaveRoom", roomId);
+		if (!address) {
+			toast.error("Please connect your wallet to leave a room");
+			return;
+		}
+		try {
+			await leaveRoom();
+			toast.success("Left room successfully");
+		} catch (error) {
+			console.error("Failed to leave room:", error);
+			toast.error("Failed to leave room");
+		}
+	};
+
 	return (
 		<div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-background/80 w-full">
 			<LobbyHeader
@@ -97,6 +109,7 @@ export default function GameLobby() {
 						isConnected={isConnected}
 						connectionError={connectionError}
 						onJoinRoom={handleJoinRoom}
+						onLeaveRoom={handleLeaveRoom}
 					/>
 				</div>
 			</main>

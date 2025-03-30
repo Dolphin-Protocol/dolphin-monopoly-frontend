@@ -1,5 +1,8 @@
+"use client";
+
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useCustomWallet } from "@/contexts/WalletContext";
 
 interface ConnectionStatusProps {
 	isConnecting: boolean;
@@ -10,6 +13,12 @@ export function ConnectionStatus({
 	isConnecting,
 	isConnected,
 }: ConnectionStatusProps) {
+	const { isConnected: isWalletConnected } = useCustomWallet();
+
+	if (!isWalletConnected) {
+		return null;
+	}
+
 	if (isConnecting) {
 		return (
 			<div className="flex items-center text-yellow-500">

@@ -1,109 +1,169 @@
+"use client";
+
 import { useState, useEffect, useCallback } from "react";
-import { socket } from "@/socket/gameSocket";
+import { useSocket } from "@/contexts/SocketContext";
 import { Room } from "@/types/game";
 
 interface UseLobbyReturn {
 	isConnecting: boolean;
 	isConnected: boolean;
-	connectionError: string;
 	socketId: string;
+	connectionError: string;
 	rooms: Room[];
-	createRoom: (address: string) => Promise<{ roomId: string }>;
-	joinRoom: (address: string, roomId: string) => Promise<void>;
+	createRoom: (address: string) => Promise<Room>;
+	joinRoom: (address: string, roomId: string) => Promise<Room>;
+	leaveRoom: () => Promise<Room>;
 	disconnect: () => void;
 }
 
 export const useLobby = (): UseLobbyReturn => {
-	const [isConnecting, setIsConnecting] = useState<boolean>(false);
-	const [isConnected, setIsConnected] = useState<boolean>(false);
-	const [connectionError, setConnectionError] = useState<string>("");
-	const [socketId, setSocketId] = useState<string>("");
+	const {
+		socket,
+		isConnecting: socketIsConnecting,
+		isConnected: socketIsConnected,
+		socketId: socketSocketId,
+		connectionError: socketConnectionError,
+	} = useSocket();
 	const [rooms, setRooms] = useState<Room[]>([]);
 
+	// Function to fetch room list
+	const fetchRooms = useCallback(() => {
+		if (socketIsConnected && socket) {
+			console.log("Requesting room list");
+			socket.emit("rooms");
+		}
+	}, [socketIsConnected, socket]);
+
 	useEffect(() => {
-		setIsConnecting(true);
-		socket.connect();
-
-		socket.on("connect", () => {
-			setIsConnecting(false);
-			setIsConnected(true);
-			setSocketId(socket.id || "");
-			setConnectionError("");
-			console.log("Connected to WebSocket Server:", socket.id);
-		});
-
-		socket.on("disconnect", () => {
-			setIsConnected(false);
-			setSocketId("");
-			console.log("Disconnected from WebSocket Server");
-		});
+		if (!socket) return;
 
 		socket.on("rooms", (data) => {
 			console.log("Received rooms:", data.rooms);
 			setRooms(data.rooms);
 		});
 
-		socket.on("connect_error", (error) => {
-			setIsConnecting(false);
-			setConnectionError(error.message);
-			console.error("WebSocket Connection Error:", error);
+		socket.on("error", (data) => {
+			console.error("Socket error:", data.message);
 		});
 
 		return () => {
 			socket.off("rooms");
+			socket.off("error");
 		};
-	}, []);
+	}, [socket]);
+
+	// Fetch rooms when connection status changes
+	useEffect(() => {
+		if (socketIsConnected) {
+			fetchRooms();
+		}
+	}, [socketIsConnected, fetchRooms]);
 
 	const createRoom = useCallback(
-		(address: string): Promise<{ roomId: string }> => {
+		(address: string): Promise<Room> => {
 			return new Promise((resolve, reject) => {
-				if (!isConnected) {
+				if (!socketIsConnected || !socket) {
 					reject(new Error("WebSocket is not connected"));
 					return;
 				}
+
+				// Listen for error events
+				const handleError = (data: { message: string }) => {
+					console.error("Create room error:", data.message);
+					reject(new Error(data.message));
+					socket.off("error", handleError);
+				};
+
+				socket.on("error", handleError);
 
 				socket.emit("createRoom", { address });
 
 				socket.once("roomCreated", (data) => {
 					console.log("Room created:", data);
+					socket.off("error", handleError);
 					resolve(data);
+					// Refresh room list after creating a room
+					fetchRooms();
 				});
 			});
 		},
-		[isConnected]
+		[socketIsConnected, socket, fetchRooms]
 	);
 
 	const joinRoom = useCallback(
-		(address: string, roomId: string): Promise<void> => {
+		(address: string, roomId: string): Promise<Room> => {
 			return new Promise((resolve, reject) => {
-				if (!isConnected) {
+				if (!socketIsConnected || !socket) {
 					reject(new Error("WebSocket is not connected"));
 					return;
 				}
+
+				// Listen for error events
+				const handleError = (data: { message: string }) => {
+					console.error("Join room error:", data.message);
+					reject(new Error(data.message));
+					socket.off("error", handleError);
+				};
+
+				socket.on("error", handleError);
 
 				socket.emit("joinRoom", { address, roomId });
 
 				socket.once("userJoined", (data) => {
 					console.log("User joined:", data);
-					resolve();
+					socket.off("error", handleError);
+					resolve(data);
+					// Refresh room list after joining a room
+					fetchRooms();
 				});
 			});
 		},
-		[isConnected]
+		[socketIsConnected, socket, fetchRooms]
 	);
 
+	const leaveRoom = useCallback((): Promise<Room> => {
+		return new Promise((resolve, reject) => {
+			if (!socketIsConnected || !socket) {
+				reject(new Error("WebSocket is not connected"));
+				return;
+			}
+
+			// Listen for error events
+			const handleError = (data: { message: string }) => {
+				console.error("Leave room error:", data.message);
+				reject(new Error(data.message));
+				socket.off("error", handleError);
+			};
+
+			socket.on("error", handleError);
+
+			socket.emit("leaveRoom");
+
+			socket.once("userLeft", (data) => {
+				console.log("User left:", data);
+				socket.off("error", handleError);
+				resolve(data);
+				// Refresh room list after leaving a room
+				fetchRooms();
+			});
+		});
+	}, [socketIsConnected, socket, fetchRooms]);
+
 	const disconnect = useCallback(() => {
-		socket.disconnect();
-	}, []);
+		if (socket) {
+			socket.disconnect();
+		}
+	}, [socket]);
 
 	return {
-		isConnecting,
-		isConnected,
-		connectionError,
-		socketId,
+		isConnecting: socketIsConnecting,
+		isConnected: socketIsConnected,
+		socketId: socketSocketId || "",
+		connectionError: socketConnectionError,
 		rooms,
 		createRoom,
 		joinRoom,
+		leaveRoom,
 		disconnect,
 	};
 };
