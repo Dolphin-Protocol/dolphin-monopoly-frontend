@@ -10,6 +10,7 @@ interface RoomListProps {
 	isConnecting: boolean;
 	isConnected: boolean;
 	connectionError: string;
+	currentRoom: Room | null;
 	onJoinRoom: (roomId: string) => void;
 	onLeaveRoom: (roomId: string) => void;
 }
@@ -21,6 +22,7 @@ export function RoomList({
 	connectionError,
 	onJoinRoom,
 	onLeaveRoom,
+	currentRoom,
 }: RoomListProps) {
 	const { isConnected: isWalletConnected } = useCustomWallet();
 
@@ -81,6 +83,8 @@ export function RoomList({
 						room={room}
 						onJoin={onJoinRoom}
 						onLeave={onLeaveRoom}
+						isCurrentRoom={room.roomId === currentRoom?.roomId}
+						hasJoinedRoom={!!currentRoom}
 					/>
 				))
 			) : (

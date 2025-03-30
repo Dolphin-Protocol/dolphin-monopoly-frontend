@@ -3,12 +3,13 @@
 import { Search, Plus, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
+import { Room } from "@/types/game";
 interface SearchBarProps {
 	searchQuery: string;
 	onSearchChange: (query: string) => void;
 	onCreateRoom: () => void;
 	isCreatingRoom: boolean;
+	currentRoom: Room | null;
 }
 
 export function SearchBar({
@@ -16,6 +17,7 @@ export function SearchBar({
 	onSearchChange,
 	onCreateRoom,
 	isCreatingRoom,
+	currentRoom,
 }: SearchBarProps) {
 	return (
 		<div className="flex flex-col sm:flex-row gap-4 justify-between">
@@ -34,7 +36,7 @@ export function SearchBar({
 				<Button
 					className="w-full sm:w-auto"
 					onClick={onCreateRoom}
-					disabled={isCreatingRoom}
+					disabled={isCreatingRoom || !!currentRoom}
 				>
 					{isCreatingRoom ? (
 						<>

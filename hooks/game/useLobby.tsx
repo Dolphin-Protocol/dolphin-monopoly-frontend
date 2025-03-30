@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSocket } from "@/contexts/SocketContext";
 import { Room } from "@/types/game";
+import { useCustomWallet } from "@/contexts/WalletContext";
 
 interface UseLobbyReturn {
 	isConnecting: boolean;
@@ -10,6 +11,7 @@ interface UseLobbyReturn {
 	socketId: string;
 	connectionError: string;
 	rooms: Room[];
+	currentRoom: Room | null;
 	createRoom: (address: string) => Promise<Room>;
 	joinRoom: (address: string, roomId: string) => Promise<Room>;
 	leaveRoom: () => Promise<Room>;
@@ -25,6 +27,8 @@ export const useLobby = (): UseLobbyReturn => {
 		connectionError: socketConnectionError,
 	} = useSocket();
 	const [rooms, setRooms] = useState<Room[]>([]);
+	const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
+	const { address } = useCustomWallet();
 
 	// Function to fetch room list
 	const fetchRooms = useCallback(() => {
@@ -58,6 +62,15 @@ export const useLobby = (): UseLobbyReturn => {
 			fetchRooms();
 		}
 	}, [socketIsConnected, fetchRooms]);
+
+	useEffect(() => {
+		if (rooms.length > 0 && address) {
+			const room = rooms.find((room) =>
+				room.members.some((member) => member.address === address)
+			);
+			setCurrentRoom(room || null);
+		}
+	}, [socketIsConnected, socket, rooms, address, setCurrentRoom]);
 
 	const createRoom = useCallback(
 		(address: string): Promise<Room> => {
@@ -161,6 +174,7 @@ export const useLobby = (): UseLobbyReturn => {
 		socketId: socketSocketId || "",
 		connectionError: socketConnectionError,
 		rooms,
+		currentRoom,
 		createRoom,
 		joinRoom,
 		leaveRoom,

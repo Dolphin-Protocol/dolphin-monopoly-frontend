@@ -1,6 +1,6 @@
 "use client";
 
-import { Users, Clock} from "lucide-react";
+import { Users, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,14 +17,27 @@ import { useCustomWallet } from "@/contexts/WalletContext";
 
 interface RoomCardProps {
 	room: Room;
+	isCurrentRoom: boolean;
+	hasJoinedRoom: boolean;
 	onJoin: (roomId: string) => void;
 	onLeave: (roomId: string) => void;
 }
 
-export function RoomCard({ room, onJoin, onLeave }: RoomCardProps) {
+export function RoomCard({
+	room,
+	isCurrentRoom,
+	hasJoinedRoom,
+	onJoin,
+	onLeave,
+}: RoomCardProps) {
 	const { address } = useCustomWallet();
+
 	return (
-		<Card className="overflow-hidden transition-all hover:shadow-md">
+		<Card
+			className={`overflow-hidden transition-all hover:shadow-md ${
+				isCurrentRoom ? "border-primary" : ""
+			}`}
+		>
 			<CardHeader className="pb-2">
 				<div className="flex justify-between items-start">
 					<div className="flex items-center gap-2">
@@ -63,13 +76,17 @@ export function RoomCard({ room, onJoin, onLeave }: RoomCardProps) {
 							</svg>
 						</Button>
 					</div>
-					<Badge
-						variant={
-							room.members[0].isCreator ? "secondary" : "default"
-						}
+					{isCurrentRoom && (
+						<Badge
+							variant={
+								room.members[0].address === address
+									? "secondary"
+									: "default"
+							}
 					>
-						{room.members[0].isCreator ? "Host" : "Player"}
-					</Badge>
+							{room.members[0].address === address ? "Host" : "Player"}
+						</Badge>
+					)}
 				</div>
 				<CardDescription>
 					Host: {shortenAddress(room.members[0].address)}
@@ -89,12 +106,21 @@ export function RoomCard({ room, onJoin, onLeave }: RoomCardProps) {
 			</CardContent>
 			<CardFooter className="pt-2 flex justify-between">
 				<Badge variant="outline">{room.members.length} Players</Badge>
-				{room.members.some((member) => member.address === address) ? (
-					<Button variant="destructive" size="sm" onClick={() => onLeave(room.roomId)}>
+				{isCurrentRoom ? (
+					<Button
+						variant="destructive"
+						size="sm"
+						onClick={() => onLeave(room.roomId)}
+					>
 						Leave
 					</Button>
 				) : (
-					<Button variant="default" size="sm" onClick={() => onJoin(room.roomId)}>
+					<Button
+						variant="default"
+						size="sm"
+						onClick={() => onJoin(room.roomId)}
+						disabled={hasJoinedRoom}
+					>
 						Join
 					</Button>
 				)}

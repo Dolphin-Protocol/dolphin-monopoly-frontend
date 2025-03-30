@@ -19,6 +19,7 @@ export default function GameLobby() {
 		isConnected,
 		connectionError,
 		rooms: serverRooms,
+		currentRoom,
 		createRoom,
 		joinRoom,
 		leaveRoom,
@@ -101,6 +102,7 @@ export default function GameLobby() {
 						onSearchChange={setSearchQuery}
 						onCreateRoom={handleCreateRoom}
 						isCreatingRoom={isCreatingRoom}
+						currentRoom={currentRoom}
 					/>
 
 					<RoomList
@@ -110,6 +112,7 @@ export default function GameLobby() {
 						connectionError={connectionError}
 						onJoinRoom={handleJoinRoom}
 						onLeaveRoom={handleLeaveRoom}
+						currentRoom={currentRoom}
 					/>
 				</div>
 			</main>
