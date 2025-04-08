@@ -1,21 +1,21 @@
-import { Button } from "../ui/button";
+// import { Button } from "../ui/button";
 
-type DiceRollProps = {
-	onRoll: (value: number) => void;
-	disabled?: boolean;
-};
+// type DiceRollProps = {
+// 	onRoll: (value: number) => void;
+// 	disabled?: boolean;
+// };
 
-const DiceRoll = ({ onRoll, disabled = false }: DiceRollProps) => {
-	const rollDice = () => {
-		const value = Math.floor(Math.random() * 6) + 1;
-		onRoll(value);
-	};
+// const DiceRoll = ({ onRoll, disabled = false }: DiceRollProps) => {
+// 	const rollDice = () => {
+// 		const value = Math.floor(Math.random() * 6) + 1;
+// 		onRoll(value);
+// 	};
 
-	return (
-		<Button onClick={rollDice} disabled={disabled}>
-			Roll Dice
-		</Button>
-	);
-};
+// 	return (
+// 		<Button onClick={rollDice} disabled={disabled}>
+// 			Roll Dice
+// 		</Button>
+// 	);
+// };
 
-export default DiceRoll;
+// export default DiceRoll;

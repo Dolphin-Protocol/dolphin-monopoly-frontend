@@ -1,7 +1,7 @@
 "use client";
 
-import GameBoard from "@/components/game/GameBoard";
+import GameCanvas from "@/components/game/GameCanvas";
 
 export default function GamePage() {
-	return <GameBoard />;
+	return <GameCanvas />;
 }
