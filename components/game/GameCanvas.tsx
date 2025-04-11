@@ -11,8 +11,8 @@ export default function PhaserGame() {
 
 		const config: Phaser.Types.Core.GameConfig = {
 			type: Phaser.AUTO,
-			width: 800,
-			height: 600,
+			width: window.innerWidth,
+			height: window.innerHeight,
 			parent: "phaser-container",
 			physics: {
 				default: "arcade",
@@ -37,51 +37,79 @@ export default function PhaserGame() {
 
 	function preload(this: Phaser.Scene) {
 		this.load.tilemapTiledJSON("map", "/maps/map.json");
-        this.load.on(
-			"filecomplete",
-			function (key: string, type: string, data: any) {
-				console.log("File loaded:", key, type);
-			}
-		);
-		// this.load.image("wooden_bridge", "/maps/Wooden_Bridge.png");
-		// this.load.image("wooden_bridge_v2", "/maps/Wooden_Bridge_v2.png");
+		this.load.image("Wooden_Bridge", "/maps/Wooden_Bridge.png");
+		this.load.image("Wooden_Bridge_v2", "/maps/Wooden_Bridge_v2.png");
 		this.load.image("Water", "/maps/Water.png");
-		// this.load.image("water_objects", "/maps/Water_Objects.png");
-		// this.load.image("trees", "/maps/Trees.png");
-		// this.load.image(
-		// 	"stone_ground_hills_tiles",
-		// 	"/maps/Stone_Ground_Hills_Tiles.png"
-		// );
-		// this.load.image(
-		// 	"soil_ground_hills_tiles",
-		// 	"/maps/Soil_Ground_HiIls_Tiles.png"
-		// );
-		// this.load.image("paths", "/maps/Paths.png");
-		// this.load.image(
-		// 	"grass_hill_tiles_slopes_v2",
-		// 	"/maps/Grass_Hill_Tiles_Slopes_v2.png"
-		// );
-		// this.load.image("grass_hill_tiles_v2", "/maps/Grass_Hill_Tiles_v2.png");
-		// this.load.image("grass_tile_layers2", "/maps/Grass_Tile_layers2.png");
-		// this.load.image(
-		// 	"darker_soil_ground_tiles",
-		// 	"/maps/Darker_Soil_Ground_Tiles.png"
-		// );
-		// this.load.image("grass_tile_layers", "/maps/Grass_Tile_layers.png");
-		// this.load.image(
-		// 	"darker_grass_hills_tiles_v2",
-		// 	"/maps/Darker_Grass_Hills_Tiles_v2.png"
-		// );
-		// this.load.image("chicken_houses", "/maps/Chicken_Houses.png");
-		// this.load.image("basic_furniture", "/maps/Basic_Furniture.png");
+		this.load.image("Water_Objects", "/maps/Water_Objects.png");
+		this.load.image("Trees", "/maps/Trees.png");
+		this.load.image(
+			"Stone_Ground_Hills_Tiles",
+			"/maps/Stone_Ground_Hills_Tiles.png"
+		);
+		this.load.image(
+			"Soil_Ground_HiIls_Tiles",
+			"/maps/Soil_Ground_HiIls_Tiles.png"
+		);
+		this.load.image("Paths", "/maps/Paths.png");
+		this.load.image(
+			"Grass_Hill_Tiles_Slopes_v2",
+			"/maps/Grass_Hill_Tiles_Slopes_v2.png"
+		);
+		this.load.image("Grass_Hill_Tiles_v2", "/maps/Grass_Hill_Tiles_v2.png");
+		this.load.image("Grass_Tile_layers2", "/maps/Grass_Tile_layers2.png");
+		this.load.image(
+			"Darker_Soil_Ground_Tiles",
+			"/maps/Darker_Soil_Ground_Tiles.png"
+		);
+		this.load.image("Grass_Tile_layers", "/maps/Grass_Tile_layers.png");
+		this.load.image(
+			"Darker_Grass_Hills_Tiles_v2",
+			"/maps/Darker_Grass_Hills_Tiles_v2.png"
+		);
+		this.load.image("Chicken_Houses", "/maps/Chicken_Houses.png");
+		this.load.image("Basic_Furniture", "/maps/Basic_Furniture.png");
 	}
 
 	function create(this: Phaser.Scene) {
 		const map = this.make.tilemap({ key: "map" });
-        console.log("Map:", map);
 		const waterTileset = map.addTilesetImage("Water", "Water");
+		const landTileset1 = map.addTilesetImage(
+			"NormalGrassHill",
+			"Grass_Hill_Tiles_v2"
+		)!;
+		const landTileset2 = map.addTilesetImage(
+			"DarkerGrassHills",
+			"Darker_Grass_Hills_Tiles_v2"
+		)!;
+		const landTileset3 = map.addTilesetImage(
+			"SoilGroundHiIls",
+			"Soil_Ground_HiIls_Tiles"
+		)!;
+		const landTileset4 = map.addTilesetImage(
+			"StoneGroundHills",
+			"Stone_Ground_Hills_Tiles"
+		)!;
+		const landTileset5 = map.addTilesetImage(
+			"DarkerSoilGround",
+			"Darker_Soil_Ground_Tiles"
+		)!;
 		const waterLayer = map.createLayer("water", waterTileset!);
-        console.log("Water layer:", waterLayer);
+
+		if (
+			landTileset1 &&
+			landTileset2 &&
+			landTileset3 &&
+			landTileset4 &&
+			landTileset5
+		) {
+			const landLayer = map.createLayer("land", [
+				landTileset1,
+				landTileset2,
+				landTileset3,
+				landTileset4,
+				landTileset5,
+			]);
+		}
 	}
 
 	function update(this: Phaser.Scene) {}
