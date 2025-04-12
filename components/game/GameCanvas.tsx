@@ -72,43 +72,114 @@ export default function PhaserGame() {
 
 	function create(this: Phaser.Scene) {
 		const map = this.make.tilemap({ key: "map" });
-		const waterTileset = map.addTilesetImage("Water", "Water");
-		const landTileset1 = map.addTilesetImage(
+		const waterTileset = map.addTilesetImage("Water", "Water")!;
+		const GrassHillTileset = map.addTilesetImage(
 			"NormalGrassHill",
 			"Grass_Hill_Tiles_v2"
 		)!;
-		const landTileset2 = map.addTilesetImage(
+		const DarkerGrassHillsTileset = map.addTilesetImage(
 			"DarkerGrassHills",
 			"Darker_Grass_Hills_Tiles_v2"
 		)!;
-		const landTileset3 = map.addTilesetImage(
+		const SoilGroundHiIlsTileset = map.addTilesetImage(
 			"SoilGroundHiIls",
 			"Soil_Ground_HiIls_Tiles"
 		)!;
-		const landTileset4 = map.addTilesetImage(
+		const StoneGroundHillsTileset = map.addTilesetImage(
 			"StoneGroundHills",
 			"Stone_Ground_Hills_Tiles"
 		)!;
-		const landTileset5 = map.addTilesetImage(
+		const DarkerSoilGroundTileset = map.addTilesetImage(
 			"DarkerSoilGround",
 			"Darker_Soil_Ground_Tiles"
 		)!;
-		const waterLayer = map.createLayer("water", waterTileset!);
+
+		const WoodenBridgeTileset = map.addTilesetImage(
+			"WoodenBridgeSimple",
+			"Wooden_Bridge"
+		);
+		const WoodenBridgeV2Tileset = map.addTilesetImage(
+			"WoodenBridge",
+			"Wooden_Bridge_v2"
+		);
+		const WaterObjectsTileset = map.addTilesetImage(
+			"Water_Objects",
+			"Water_Objects"
+		);
+		const TreesTileset = map.addTilesetImage("Trees", "Trees");
+		const GrassTileLayersTileset = map.addTilesetImage(
+			"Grass",
+			"Grass_Tile_layers"
+		);
+		const GrassTileLayers2Tileset = map.addTilesetImage(
+			"Grass2",
+			"Grass_Tile_layers2"
+		);
+		const ChickenHousesTileset = map.addTilesetImage(
+			"ChickenHouses",
+			"Chicken_Houses"
+		);
+		const BasicFurnitureTileset = map.addTilesetImage(
+			"Basic_Furniture",
+			"Basic_Furniture"
+		);
+
 
 		if (
-			landTileset1 &&
-			landTileset2 &&
-			landTileset3 &&
-			landTileset4 &&
-			landTileset5
+			waterTileset &&
+			GrassHillTileset &&
+			DarkerGrassHillsTileset &&
+			SoilGroundHiIlsTileset &&
+			StoneGroundHillsTileset &&
+			DarkerSoilGroundTileset &&
+			WoodenBridgeTileset &&
+			WoodenBridgeV2Tileset &&
+			WaterObjectsTileset &&
+			TreesTileset &&
+			GrassTileLayersTileset &&
+			GrassTileLayers2Tileset &&
+			ChickenHousesTileset &&
+			BasicFurnitureTileset
 		) {
+			const waterLayer = map.createLayer("water", waterTileset);
 			const landLayer = map.createLayer("land", [
-				landTileset1,
-				landTileset2,
-				landTileset3,
-				landTileset4,
-				landTileset5,
+				GrassHillTileset,
+				DarkerGrassHillsTileset,
+				SoilGroundHiIlsTileset,
+				StoneGroundHillsTileset,
+				DarkerSoilGroundTileset,
 			]);
+			const backgroundItemsLayer = map.createLayer(
+				"background_items",
+				[
+					WaterObjectsTileset,
+					WoodenBridgeTileset,
+					WoodenBridgeV2Tileset,
+					GrassTileLayersTileset,
+					GrassTileLayers2Tileset,
+					ChickenHousesTileset,
+					BasicFurnitureTileset,
+					DarkerGrassHillsTileset,
+					DarkerSoilGroundTileset,
+					StoneGroundHillsTileset,
+					SoilGroundHiIlsTileset,
+					GrassHillTileset,
+				]
+			);
+			const grassLayer = map.createLayer("grass", [
+				GrassTileLayersTileset,
+				GrassTileLayers2Tileset,
+				GrassHillTileset,
+				DarkerGrassHillsTileset,
+			]);
+			const housesLayer = map.createLayer("houses", ChickenHousesTileset);
+			const camera = this.cameras.main;
+
+			camera.setZoom(4);
+
+			camera.centerOn(624, 624);
+
+			camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 		}
 	}
 
