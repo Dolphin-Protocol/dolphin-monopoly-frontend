@@ -16,6 +16,7 @@ type Player = {
 };
 
 let players: Player[] = [];
+let currentPlayerIndex = 0;
 
 const path: { x: number; y: number; direction: Direction }[] = [
 	{ x: 40, y: 40, direction: "left" },
@@ -298,35 +299,87 @@ export default function PhaserGame() {
 
 			// 	movePlayer(this, playerOneSprite, playerState, steps, tileSize);
 			// });
+			this.input.on("pointerdown", () => {
+				nextTurn(this);
+			});
 		}
 	}
 
 	function update(this: Phaser.Scene) {}
 
+	// function movePlayer(
+	// 	scene: Phaser.Scene,
+	// 	player: Phaser.GameObjects.Sprite,
+	// 	playerState: PlayerState,
+	// 	steps: number,
+	// 	tileSize: number
+	// ) {
+	// 	let nextIndex = (playerState.positionIndex + steps) % path.length;
+	// 	const { x, y, direction } = path[nextIndex];
+
+	// 	playerState.positionIndex = nextIndex;
+	// 	playerState.direction = direction;
+
+	// 	player.anims.play("walk-" + direction, true);
+
+	// 	scene.tweens.add({
+	// 		targets: player,
+	// 		x: x * tileSize + tileSize / 2,
+	// 		y: y * tileSize + tileSize / 2,
+	// 		duration: 300 * steps,
+	// 		ease: "Linear",
+	// 		onComplete: () => {
+	// 			player.anims.stop();
+	// 		},
+	// 	});
+	// }
+
 	function movePlayer(
 		scene: Phaser.Scene,
-		player: Phaser.GameObjects.Sprite,
-		playerState: PlayerState,
+		player: Player,
 		steps: number,
-		tileSize: number
+		onComplete: () => void
 	) {
-		let nextIndex = (playerState.positionIndex + steps) % path.length;
-		const { x, y, direction } = path[nextIndex];
+		const moveOneStep = (step = 0) => {
+			if (step >= steps) {
+				onComplete();
+				return;
+			}
 
-		playerState.positionIndex = nextIndex;
-		playerState.direction = direction;
+			const tileSize = 16;
 
-		player.anims.play("walk-" + direction, true);
+			player.state.positionIndex =
+				(player.state.positionIndex + 1) % path.length;
+			const nextTile = path[player.state.positionIndex];
+			player.state.direction = nextTile.direction;
 
-		scene.tweens.add({
-			targets: player,
-			x: x * tileSize + tileSize / 2,
-			y: y * tileSize + tileSize / 2,
-			duration: 300 * steps,
-			ease: "Linear",
-			onComplete: () => {
-				player.anims.stop();
-			},
+			player.sprite.anims.play(`walk-${nextTile.direction}`, true);
+
+			scene.tweens.add({
+				targets: player.sprite,
+				x: nextTile.x * tileSize + tileSize / 2,
+				y: nextTile.y * tileSize + tileSize / 2,
+				duration: 300,
+				onComplete: () => {
+					moveOneStep(step + 1);
+				},
+			});
+		};
+
+		moveOneStep();
+	}
+
+	function nextTurn(scene: Phaser.Scene) {
+		const currentPlayer = players[currentPlayerIndex];
+		const steps = Phaser.Math.Between(1, 6);
+
+		movePlayer(scene, currentPlayer, steps, () => {
+			currentPlayer.sprite.anims.stop();
+			currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+			scene.cameras.main.startFollow(
+				players[currentPlayerIndex].sprite,
+				true
+			);
 		});
 	}
 
