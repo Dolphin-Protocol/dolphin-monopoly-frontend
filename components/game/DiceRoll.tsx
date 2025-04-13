@@ -1,21 +1,26 @@
-// import { Button } from "../ui/button";
+import { Button } from "../ui/button";
 
-// type DiceRollProps = {
-// 	onRoll: (value: number) => void;
-// 	disabled?: boolean;
-// };
+type DiceRollProps = {
+	disabled?: boolean;
+};
 
-// const DiceRoll = ({ onRoll, disabled = false }: DiceRollProps) => {
-// 	const rollDice = () => {
-// 		const value = Math.floor(Math.random() * 6) + 1;
-// 		onRoll(value);
-// 	};
+const DiceRoll = ({ disabled = false }: DiceRollProps) => {
+	const handleRoll = () => {
+		const rolled = Math.floor(Math.random() * 6) + 1;
+		window.dispatchEvent(
+			new CustomEvent("dice-rolled", { detail: rolled })
+		);
+	};
 
-// 	return (
-// 		<Button onClick={rollDice} disabled={disabled}>
-// 			Roll Dice
-// 		</Button>
-// 	);
-// };
+	return (
+		<Button
+			onClick={handleRoll}
+			disabled={disabled}
+			className="absolute right-6 top-6"
+		>
+			Roll Dice
+		</Button>
+	);
+};
 
-// export default DiceRoll;
+export default DiceRoll;

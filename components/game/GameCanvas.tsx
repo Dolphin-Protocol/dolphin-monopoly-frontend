@@ -3,6 +3,45 @@
 import React, { useEffect, useRef } from "react";
 import Phaser from "phaser";
 
+type Direction = "left" | "right" | "up" | "down";
+
+interface PlayerState {
+	positionIndex: number;
+	direction: Direction;
+}
+
+type Player = {
+	sprite: Phaser.GameObjects.Sprite;
+	state: PlayerState;
+};
+
+let players: Player[] = [];
+
+const path: { x: number; y: number; direction: Direction }[] = [
+	{ x: 40, y: 40, direction: "left" },
+	{ x: 34, y: 40, direction: "left" },
+	{ x: 28, y: 40, direction: "left" },
+	{ x: 22, y: 40, direction: "left" },
+	{ x: 16, y: 40, direction: "left" },
+	{ x: 10, y: 40, direction: "up" },
+	{ x: 10, y: 34, direction: "up" },
+	{ x: 10, y: 28, direction: "up" },
+	{ x: 10, y: 22, direction: "up" },
+	{ x: 10, y: 16, direction: "up" },
+	{ x: 10, y: 10, direction: "up" },
+	{ x: 10, y: 10, direction: "right" },
+	{ x: 16, y: 10, direction: "right" },
+	{ x: 22, y: 10, direction: "right" },
+	{ x: 28, y: 10, direction: "right" },
+	{ x: 34, y: 10, direction: "right" },
+	{ x: 40, y: 10, direction: "down" },
+	{ x: 40, y: 16, direction: "down" },
+	{ x: 40, y: 22, direction: "down" },
+	{ x: 40, y: 28, direction: "down" },
+	{ x: 40, y: 34, direction: "down" },
+	{ x: 40, y: 40, direction: "left" },
+];
+
 export default function PhaserGame() {
 	const gameRef = useRef<Phaser.Game | null>(null);
 
@@ -68,6 +107,10 @@ export default function PhaserGame() {
 		);
 		this.load.image("Chicken_Houses", "/maps/Chicken_Houses.png");
 		this.load.image("Basic_Furniture", "/maps/Basic_Furniture.png");
+		this.load.spritesheet("Player_one", "/characters/Player_one.png", {
+			frameWidth: 48,
+			frameHeight: 48,
+		});
 	}
 
 	function create(this: Phaser.Scene) {
@@ -124,7 +167,6 @@ export default function PhaserGame() {
 			"Basic_Furniture"
 		);
 
-
 		if (
 			waterTileset &&
 			GrassHillTileset &&
@@ -149,23 +191,20 @@ export default function PhaserGame() {
 				StoneGroundHillsTileset,
 				DarkerSoilGroundTileset,
 			]);
-			const backgroundItemsLayer = map.createLayer(
-				"background_items",
-				[
-					WaterObjectsTileset,
-					WoodenBridgeTileset,
-					WoodenBridgeV2Tileset,
-					GrassTileLayersTileset,
-					GrassTileLayers2Tileset,
-					ChickenHousesTileset,
-					BasicFurnitureTileset,
-					DarkerGrassHillsTileset,
-					DarkerSoilGroundTileset,
-					StoneGroundHillsTileset,
-					SoilGroundHiIlsTileset,
-					GrassHillTileset,
-				]
-			);
+			const backgroundItemsLayer = map.createLayer("background_items", [
+				WaterObjectsTileset,
+				WoodenBridgeTileset,
+				WoodenBridgeV2Tileset,
+				GrassTileLayersTileset,
+				GrassTileLayers2Tileset,
+				ChickenHousesTileset,
+				BasicFurnitureTileset,
+				DarkerGrassHillsTileset,
+				DarkerSoilGroundTileset,
+				StoneGroundHillsTileset,
+				SoilGroundHiIlsTileset,
+				GrassHillTileset,
+			]);
 			const grassLayer = map.createLayer("grass", [
 				GrassTileLayersTileset,
 				GrassTileLayers2Tileset,
@@ -173,17 +212,123 @@ export default function PhaserGame() {
 				DarkerGrassHillsTileset,
 			]);
 			const housesLayer = map.createLayer("houses", ChickenHousesTileset);
+
+			this.anims.create({
+				key: "walk-down",
+				frames: this.anims.generateFrameNumbers("Player_one", {
+					start: 0,
+					end: 3,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-up",
+				frames: this.anims.generateFrameNumbers("Player_one", {
+					start: 4,
+					end: 7,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-left",
+				frames: this.anims.generateFrameNumbers("Player_one", {
+					start: 8,
+					end: 11,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-right",
+				frames: this.anims.generateFrameNumbers("Player_one", {
+					start: 12,
+					end: 15,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			const tileSize = 16;
+
+			const playerOneStart = { x: 40, y: 40 };
+			const playerTwoStart = { x: 39, y: 39 };
+			
+
 			const camera = this.cameras.main;
-
 			camera.setZoom(4);
-
-			camera.centerOn(624, 624);
-
 			camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+			
+			const playerOne = {
+				sprite: this.add.sprite(
+					playerOneStart.x * tileSize + tileSize / 2,
+					playerOneStart.y * tileSize + tileSize / 2,
+					"Player_one",
+					1
+				),
+				state: { positionIndex: 0, direction: "left" } as PlayerState,
+			};
+			
+			const playerTwo = {
+				sprite: this.add.sprite(
+					playerTwoStart.x * tileSize + tileSize / 2,
+					playerTwoStart.y * tileSize + tileSize / 2,
+					"Player_one",
+					0
+				),
+				state: { positionIndex: 0, direction: "left" } as PlayerState,
+			};
+			
+			players.push(playerOne, playerTwo);
+			this.cameras.main.startFollow(playerOne.sprite);
+
+			// this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+			// 	const worldPoint = pointer.positionToCamera(
+			// 		this.cameras.main
+			// 	) as Phaser.Math.Vector2;
+			// 	const tileX = Math.floor(worldPoint.x / tileSize);
+			// 	const tileY = Math.floor(worldPoint.y / tileSize);
+			// 	const steps = Phaser.Math.Between(1, 6);
+			// 	console.log(steps);
+
+			// 	movePlayer(this, playerOneSprite, playerState, steps, tileSize);
+			// });
 		}
 	}
 
 	function update(this: Phaser.Scene) {}
 
-	return <div id="phaser-container" className="w-full h-full" />;
+	function movePlayer(
+		scene: Phaser.Scene,
+		player: Phaser.GameObjects.Sprite,
+		playerState: PlayerState,
+		steps: number,
+		tileSize: number
+	) {
+		let nextIndex = (playerState.positionIndex + steps) % path.length;
+		const { x, y, direction } = path[nextIndex];
+
+		playerState.positionIndex = nextIndex;
+		playerState.direction = direction;
+
+		player.anims.play("walk-" + direction, true);
+
+		scene.tweens.add({
+			targets: player,
+			x: x * tileSize + tileSize / 2,
+			y: y * tileSize + tileSize / 2,
+			duration: 300 * steps,
+			ease: "Linear",
+			onComplete: () => {
+				player.anims.stop();
+			},
+		});
+	}
+
+	return <div id="phaser-container" className="w-full h-full relative" />;
 }
