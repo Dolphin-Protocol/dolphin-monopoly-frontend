@@ -13,7 +13,8 @@ export default function GamePage() {
 				onZoomIn={() => {}}
 				onZoomOut={() => {}}
 			/>
-			{/* <DiceRoll /> */}
+			{/* call transition */}
+
 		</div>
 	);
 }

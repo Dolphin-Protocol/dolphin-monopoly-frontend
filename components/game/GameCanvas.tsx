@@ -112,6 +112,22 @@ export default function PhaserGame() {
 			frameWidth: 48,
 			frameHeight: 48,
 		});
+		// this.load.spritesheet("House", "/houses/Chicken_Houses.png", {
+		// 	frameWidth: 48,
+		// 	frameHeight: 48,
+		// });
+		this.load.spritesheet("House_Level_1", "/houses/House_Level_1.png", {
+			frameWidth: 32,
+			frameHeight: 42,
+		});
+		this.load.spritesheet("House_Level_2", "/houses/House_Level_2.png", {
+			frameWidth: 48,
+			frameHeight: 48,
+		});
+		this.load.spritesheet("House_Level_3", "/houses/House_Level_3.png", {
+			frameWidth: 64,
+			frameHeight: 76,
+		});
 	}
 
 	function create(this: Phaser.Scene) {
@@ -299,40 +315,19 @@ export default function PhaserGame() {
 
 			// 	movePlayer(this, playerOneSprite, playerState, steps, tileSize);
 			// });
-			this.input.on("pointerdown", () => {
-				nextTurn(this);
-			});
+			// this.input.on("pointerdown", () => {
+			// 	nextTurn(this);
+			// });
+			const level1House = this.add.sprite(544, 720, "House_Level_1", 0);
+			level1House.setOrigin(0.5, 0.5);
+			const level2House = this.add.sprite(448, 720, "House_Level_2", 0);
+			level2House.setOrigin(0.5, 0.5);
+			const level3House = this.add.sprite(352, 720, "House_Level_3", 0);
+			level3House.setOrigin(0.5, 0.5);
 		}
 	}
 
 	function update(this: Phaser.Scene) {}
-
-	// function movePlayer(
-	// 	scene: Phaser.Scene,
-	// 	player: Phaser.GameObjects.Sprite,
-	// 	playerState: PlayerState,
-	// 	steps: number,
-	// 	tileSize: number
-	// ) {
-	// 	let nextIndex = (playerState.positionIndex + steps) % path.length;
-	// 	const { x, y, direction } = path[nextIndex];
-
-	// 	playerState.positionIndex = nextIndex;
-	// 	playerState.direction = direction;
-
-	// 	player.anims.play("walk-" + direction, true);
-
-	// 	scene.tweens.add({
-	// 		targets: player,
-	// 		x: x * tileSize + tileSize / 2,
-	// 		y: y * tileSize + tileSize / 2,
-	// 		duration: 300 * steps,
-	// 		ease: "Linear",
-	// 		onComplete: () => {
-	// 			player.anims.stop();
-	// 		},
-	// 	});
-	// }
 
 	function movePlayer(
 		scene: Phaser.Scene,
