@@ -2,14 +2,11 @@
 
 import React, { useEffect, useRef } from "react";
 import Phaser from "phaser";
-
-type Direction = "left" | "right" | "up" | "down";
-
-interface PlayerState {
-	positionIndex: number;
-	direction: Direction;
-}
-
+import { PlayerState, Position } from "@/types/game";
+import { PLAYER_ONE_DEFAULT_STATE, PLAYER_TWO_DEFAULT_STATE, PLAYER_THREE_DEFAULT_STATE, PLAYER_FOUR_DEFAULT_STATE } from "@/constants/states";
+import { PLAYER_ONE_PATH , PLAYER_TWO_PATH, PLAYER_THREE_PATH} from "@/constants/paths";
+import { PLAYER_FOUR_PATH } from "@/constants/paths";
+import { HOUSE_POSITIONS } from "@/constants/houses";
 type Player = {
 	sprite: Phaser.GameObjects.Sprite;
 	state: PlayerState;
@@ -17,31 +14,7 @@ type Player = {
 
 let players: Player[] = [];
 let currentPlayerIndex = 0;
-
-const path: { x: number; y: number; direction: Direction }[] = [
-	{ x: 40, y: 40, direction: "left" },
-	{ x: 34, y: 40, direction: "left" },
-	{ x: 28, y: 40, direction: "left" },
-	{ x: 22, y: 40, direction: "left" },
-	{ x: 16, y: 40, direction: "left" },
-	{ x: 10, y: 40, direction: "up" },
-	{ x: 10, y: 34, direction: "up" },
-	{ x: 10, y: 28, direction: "up" },
-	{ x: 10, y: 22, direction: "up" },
-	{ x: 10, y: 16, direction: "up" },
-	{ x: 10, y: 10, direction: "up" },
-	{ x: 10, y: 10, direction: "right" },
-	{ x: 16, y: 10, direction: "right" },
-	{ x: 22, y: 10, direction: "right" },
-	{ x: 28, y: 10, direction: "right" },
-	{ x: 34, y: 10, direction: "right" },
-	{ x: 40, y: 10, direction: "down" },
-	{ x: 40, y: 16, direction: "down" },
-	{ x: 40, y: 22, direction: "down" },
-	{ x: 40, y: 28, direction: "down" },
-	{ x: 40, y: 34, direction: "down" },
-	{ x: 40, y: 40, direction: "left" },
-];
+const tileSize = 16;
 
 export default function PhaserGame() {
 	const gameRef = useRef<Phaser.Game | null>(null);
@@ -269,13 +242,7 @@ export default function PhaserGame() {
 				frameRate: 8,
 				repeat: -1,
 			});
-
-			const tileSize = 16;
-
-			const playerOneStart = { x: 40, y: 40 };
-			const playerTwoStart = { x: 39, y: 39 };
 			
-
 			const camera = this.cameras.main;
 			camera.setZoom(4);
 			camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -283,99 +250,163 @@ export default function PhaserGame() {
 			
 			const playerOne = {
 				sprite: this.add.sprite(
-					playerOneStart.x * tileSize + tileSize / 2,
-					playerOneStart.y * tileSize + tileSize / 2,
+					PLAYER_ONE_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
+					PLAYER_ONE_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
 					"Player_one",
-					1
+					8
 				),
-				state: { positionIndex: 0, direction: "left" } as PlayerState,
+				state: PLAYER_ONE_DEFAULT_STATE,
 			};
 			
 			const playerTwo = {
 				sprite: this.add.sprite(
-					playerTwoStart.x * tileSize + tileSize / 2,
-					playerTwoStart.y * tileSize + tileSize / 2,
+					PLAYER_TWO_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
+					PLAYER_TWO_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
 					"Player_one",
-					0
+					8
 				),
-				state: { positionIndex: 0, direction: "left" } as PlayerState,
+				state: PLAYER_TWO_DEFAULT_STATE,
+			};
+
+			const playerThree = {
+				sprite: this.add.sprite(
+					PLAYER_THREE_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
+					PLAYER_THREE_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
+					"Player_one",
+					8
+				),
+				state: PLAYER_THREE_DEFAULT_STATE,
+			};
+
+			const playerFour = {
+				sprite: this.add.sprite(
+					PLAYER_FOUR_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
+					PLAYER_FOUR_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
+					"Player_one",
+					8
+				),
+				state: PLAYER_FOUR_DEFAULT_STATE,
 			};
 			
-			players.push(playerOne, playerTwo);
+			players.push(playerOne, playerTwo, playerThree, playerFour);
 			this.cameras.main.startFollow(playerOne.sprite);
 
-			// this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-			// 	const worldPoint = pointer.positionToCamera(
-			// 		this.cameras.main
-			// 	) as Phaser.Math.Vector2;
-			// 	const tileX = Math.floor(worldPoint.x / tileSize);
-			// 	const tileY = Math.floor(worldPoint.y / tileSize);
-			// 	const steps = Phaser.Math.Between(1, 6);
-			// 	console.log(steps);
+			this.input.on("pointerdown", () => {
+				const playerObj = players[currentPlayerIndex];
+				const path = getPathByPlayer(currentPlayerIndex);
+				const steps = Phaser.Math.Between(1, 6);
 
-			// 	movePlayer(this, playerOneSprite, playerState, steps, tileSize);
-			// });
-			// this.input.on("pointerdown", () => {
-			// 	nextTurn(this);
-			// });
-			const level1House = this.add.sprite(544, 720, "House_Level_1", 0);
-			level1House.setOrigin(0.5, 0.5);
-			const level2House = this.add.sprite(448, 720, "House_Level_2", 0);
-			level2House.setOrigin(0.5, 0.5);
-			const level3House = this.add.sprite(352, 720, "House_Level_3", 0);
-			level3House.setOrigin(0.5, 0.5);
+				movePlayerAlongPath(this, playerObj, steps, path, () => {
+					console.log("移動完畢");
+				});
+			});
+
+			this.input.keyboard!.on("keydown-ENTER", () => {
+				const player = players[currentPlayerIndex];
+				const pos = HOUSE_POSITIONS[player.state.positionIndex];
+				if (!pos) return;
+
+				const housePosition = this.add.sprite(
+					pos.x * tileSize,
+					pos.y * tileSize,
+					"House_Level_1",
+					currentPlayerIndex
+				);
+				housePosition.setOrigin(0.5, 0.5);
+
+				this.tweens.add({
+					targets: housePosition,
+					scale: { from: 0, to: 1 },
+					duration: 800,
+					ease: "Back.Out",
+					onComplete: () => {
+						this.time.delayedCall(400, () => {
+							currentPlayerIndex =
+								(currentPlayerIndex + 1) % players.length;
+							const nextPlayer = players[currentPlayerIndex];
+
+							this.cameras.main.pan(
+								nextPlayer.sprite.x,
+								nextPlayer.sprite.y,
+								500,
+								"Sine.easeInOut",
+								true,
+								(
+									camera: Phaser.Cameras.Scene2D.Camera,
+									progress: number
+								) => {
+									if (progress === 1) {
+										this.cameras.main.startFollow(
+											nextPlayer.sprite
+										);
+									}
+								}
+							);
+						});
+					},
+				});
+			});
 		}
 	}
 
 	function update(this: Phaser.Scene) {}
 
-	function movePlayer(
+	function getPathByPlayer(index: number): Position[] {
+		return [
+			PLAYER_ONE_PATH,
+			PLAYER_TWO_PATH,
+			PLAYER_THREE_PATH,
+			PLAYER_FOUR_PATH,
+		][index];
+	}
+
+	function getPlayerDefaultState(index: number): PlayerState {
+		return [
+			PLAYER_ONE_DEFAULT_STATE,
+			PLAYER_TWO_DEFAULT_STATE,
+			PLAYER_THREE_DEFAULT_STATE,
+			PLAYER_FOUR_DEFAULT_STATE,
+		][index];
+	}
+
+	function movePlayerAlongPath(
 		scene: Phaser.Scene,
-		player: Player,
+		playerObj: Player,
 		steps: number,
+		path: Position[],
 		onComplete: () => void
 	) {
-		const moveOneStep = (step = 0) => {
-			if (step >= steps) {
+		const moveStep = (step: number) => {
+			const nextIndex = playerObj.state.positionIndex + 1;
+			if (nextIndex >= path.length) {
 				onComplete();
 				return;
 			}
 
-			const tileSize = 16;
+			const nextPosition = path[nextIndex];
+			playerObj.state.positionIndex = nextIndex;
+			playerObj.state.direction = nextPosition.direction;
+			playerObj.state.position = nextPosition;
 
-			player.state.positionIndex =
-				(player.state.positionIndex + 1) % path.length;
-			const nextTile = path[player.state.positionIndex];
-			player.state.direction = nextTile.direction;
-
-			player.sprite.anims.play(`walk-${nextTile.direction}`, true);
+			playerObj.sprite.anims.play(`walk-${nextPosition.direction}`, true);
 
 			scene.tweens.add({
-				targets: player.sprite,
-				x: nextTile.x * tileSize + tileSize / 2,
-				y: nextTile.y * tileSize + tileSize / 2,
+				targets: playerObj.sprite,
+				x: nextPosition.x * tileSize + 8,
+				y: nextPosition.y * tileSize + 8,
 				duration: 300,
 				onComplete: () => {
-					moveOneStep(step + 1);
+					if (step > 1) {
+						moveStep(step - 1);
+					} else {
+						playerObj.sprite.anims.stop();
+						onComplete();
+					}
 				},
 			});
 		};
 
-		moveOneStep();
-	}
-
-	function nextTurn(scene: Phaser.Scene) {
-		const currentPlayer = players[currentPlayerIndex];
-		const steps = Phaser.Math.Between(1, 6);
-
-		movePlayer(scene, currentPlayer, steps, () => {
-			currentPlayer.sprite.anims.stop();
-			currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-			scene.cameras.main.startFollow(
-				players[currentPlayerIndex].sprite,
-				true
-			);
-		});
+		moveStep(steps);
 	}
 
 	return <div id="phaser-container" className="w-full h-full relative" />;
