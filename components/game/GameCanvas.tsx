@@ -3,8 +3,17 @@
 import React, { useEffect, useRef } from "react";
 import Phaser from "phaser";
 import { PlayerState, Position } from "@/types/game";
-import { PLAYER_ONE_DEFAULT_STATE, PLAYER_TWO_DEFAULT_STATE, PLAYER_THREE_DEFAULT_STATE, PLAYER_FOUR_DEFAULT_STATE } from "@/constants/states";
-import { PLAYER_ONE_PATH , PLAYER_TWO_PATH, PLAYER_THREE_PATH} from "@/constants/paths";
+import {
+	PLAYER_ONE_DEFAULT_STATE,
+	PLAYER_TWO_DEFAULT_STATE,
+	PLAYER_THREE_DEFAULT_STATE,
+	PLAYER_FOUR_DEFAULT_STATE,
+} from "@/constants/states";
+import {
+	PLAYER_ONE_PATH,
+	PLAYER_TWO_PATH,
+	PLAYER_THREE_PATH,
+} from "@/constants/paths";
 import { PLAYER_FOUR_PATH } from "@/constants/paths";
 import { HOUSE_POSITIONS } from "@/constants/houses";
 type Player = {
@@ -242,26 +251,29 @@ export default function PhaserGame() {
 				frameRate: 8,
 				repeat: -1,
 			});
-			
+
 			const camera = this.cameras.main;
 			camera.setZoom(4);
 			camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
-			
 			const playerOne = {
 				sprite: this.add.sprite(
-					PLAYER_ONE_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
-					PLAYER_ONE_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
+					PLAYER_ONE_DEFAULT_STATE.position.x * tileSize +
+						tileSize / 2,
+					PLAYER_ONE_DEFAULT_STATE.position.y * tileSize +
+						tileSize / 2,
 					"Player_one",
 					8
 				),
 				state: PLAYER_ONE_DEFAULT_STATE,
 			};
-			
+
 			const playerTwo = {
 				sprite: this.add.sprite(
-					PLAYER_TWO_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
-					PLAYER_TWO_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
+					PLAYER_TWO_DEFAULT_STATE.position.x * tileSize +
+						tileSize / 2,
+					PLAYER_TWO_DEFAULT_STATE.position.y * tileSize +
+						tileSize / 2,
 					"Player_one",
 					8
 				),
@@ -270,8 +282,10 @@ export default function PhaserGame() {
 
 			const playerThree = {
 				sprite: this.add.sprite(
-					PLAYER_THREE_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
-					PLAYER_THREE_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
+					PLAYER_THREE_DEFAULT_STATE.position.x * tileSize +
+						tileSize / 2,
+					PLAYER_THREE_DEFAULT_STATE.position.y * tileSize +
+						tileSize / 2,
 					"Player_one",
 					8
 				),
@@ -280,14 +294,16 @@ export default function PhaserGame() {
 
 			const playerFour = {
 				sprite: this.add.sprite(
-					PLAYER_FOUR_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
-					PLAYER_FOUR_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
+					PLAYER_FOUR_DEFAULT_STATE.position.x * tileSize +
+						tileSize / 2,
+					PLAYER_FOUR_DEFAULT_STATE.position.y * tileSize +
+						tileSize / 2,
 					"Player_one",
 					8
 				),
 				state: PLAYER_FOUR_DEFAULT_STATE,
 			};
-			
+
 			players.push(playerOne, playerTwo, playerThree, playerFour);
 			this.cameras.main.startFollow(playerOne.sprite);
 

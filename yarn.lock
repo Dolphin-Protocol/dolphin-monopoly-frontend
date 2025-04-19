@@ -3873,6 +3873,11 @@ react-day-picker@8.10.1:
   resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-8.10.1.tgz#4762ec298865919b93ec09ba69621580835b8e80"
   integrity sha512-TMx7fNbhLk15eqcMt+7Z7S2KF7mfTId/XJDjKE8f+IUcFn0l08/kI4FiYTL/0yuOLmEcbR4Fwe3GJf/NiiMnPA==
 
+react-dice-roll@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/react-dice-roll/-/react-dice-roll-1.2.2.tgz#df77249133f12f4cce2512d52b5b6354ed15c236"
+  integrity sha512-QNG+RVs3CymhTkNLwfDdJ93kL4vWO+luHkQAhuNxnus9jOFUZY54AJhlDa4y576S20oEuW47nO7HvEDCtST9wQ==
+
 react-dom@^19.0.0:
   version "19.0.0"
   resolved "https://registry.npmjs.org/react-dom/-/react-dom-19.0.0.tgz"

@@ -2,17 +2,10 @@
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { FaMap } from "react-icons/fa";
-import { FiMinus, FiPlus } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-type MiniMapProps = {
-	onCellClick: (index: number) => void;
-	onZoomIn: () => void;
-	onZoomOut: () => void;
-};
-
-const MiniMap = ({ onCellClick, onZoomIn, onZoomOut }: MiniMapProps) => {
+const MiniMap = () => {
 	const [isOpen, setIsOpen] = useState(true);
 
 	if (!isOpen) {
@@ -37,22 +30,6 @@ const MiniMap = ({ onCellClick, onZoomIn, onZoomOut }: MiniMapProps) => {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={onZoomOut}
-						className="w-6 h-6 bg-white"
-					>
-						<FiMinus size={14} />
-					</Button>
-					<Button
-						variant="outline"
-						size="icon"
-						onClick={onZoomIn}
-						className="w-6 h-6 bg-white"
-					>
-						<FiPlus size={14} />
-					</Button>
-					<Button
-						variant="outline"
-						size="icon"
 						onClick={() => setIsOpen(false)}
 						className="w-6 h-6 bg-white"
 					>
@@ -64,7 +41,6 @@ const MiniMap = ({ onCellClick, onZoomIn, onZoomOut }: MiniMapProps) => {
 						{Array.from({ length: 64 }).map((_, index) => (
 							<div
 								key={index}
-								onClick={() => onCellClick(index)}
 								className="bg-white hover:bg-blue-200 cursor-pointer transition-colors rounded-sm"
 							/>
 						))}
