@@ -28,6 +28,7 @@ export type House = {
 };
 
 export type PlayerState = {
+	playerIndex: number;
 	positionIndex: number;
 	direction: Direction;
 	assets: number;

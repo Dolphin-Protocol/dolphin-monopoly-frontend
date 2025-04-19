@@ -94,10 +94,18 @@ export default function PhaserGame() {
 			frameWidth: 48,
 			frameHeight: 48,
 		});
-		// this.load.spritesheet("House", "/houses/Chicken_Houses.png", {
-		// 	frameWidth: 48,
-		// 	frameHeight: 48,
-		// });
+		this.load.spritesheet("Player_two", "/characters/Player_two.png", {
+			frameWidth: 48,
+			frameHeight: 48,
+		});
+		this.load.spritesheet("Player_three", "/characters/Player_three.png", {
+			frameWidth: 48,
+			frameHeight: 48,
+		});
+		this.load.spritesheet("Player_four", "/characters/Player_four.png", {
+			frameWidth: 48,
+			frameHeight: 48,
+		});
 		this.load.spritesheet("House_Level_1", "/houses/House_Level_1.png", {
 			frameWidth: 32,
 			frameHeight: 42,
@@ -213,7 +221,7 @@ export default function PhaserGame() {
 			const housesLayer = map.createLayer("houses", ChickenHousesTileset);
 
 			this.anims.create({
-				key: "walk-down",
+				key: "walk-down-1",
 				frames: this.anims.generateFrameNumbers("Player_one", {
 					start: 0,
 					end: 3,
@@ -223,7 +231,37 @@ export default function PhaserGame() {
 			});
 
 			this.anims.create({
-				key: "walk-up",
+				key: "walk-down-2",
+				frames: this.anims.generateFrameNumbers("Player_two", {
+					start: 0,
+					end: 3,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-down-3",
+				frames: this.anims.generateFrameNumbers("Player_three", {
+					start: 0,
+					end: 3,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-down-4",
+				frames: this.anims.generateFrameNumbers("Player_four", {
+					start: 0,
+					end: 3,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-up-1",
 				frames: this.anims.generateFrameNumbers("Player_one", {
 					start: 4,
 					end: 7,
@@ -233,7 +271,37 @@ export default function PhaserGame() {
 			});
 
 			this.anims.create({
-				key: "walk-left",
+				key: "walk-up-2",
+				frames: this.anims.generateFrameNumbers("Player_two", {
+					start: 4,
+					end: 7,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-up-3",
+				frames: this.anims.generateFrameNumbers("Player_three", {
+					start: 4,
+					end: 7,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-up-4",
+				frames: this.anims.generateFrameNumbers("Player_four", {
+					start: 4,
+					end: 7,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-left-1",
 				frames: this.anims.generateFrameNumbers("Player_one", {
 					start: 8,
 					end: 11,
@@ -243,8 +311,68 @@ export default function PhaserGame() {
 			});
 
 			this.anims.create({
-				key: "walk-right",
+				key: "walk-left-2",
+				frames: this.anims.generateFrameNumbers("Player_two", {
+					start: 8,
+					end: 11,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-left-3",
+				frames: this.anims.generateFrameNumbers("Player_three", {
+					start: 8,
+					end: 11,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-left-4",
+				frames: this.anims.generateFrameNumbers("Player_four", {
+					start: 8,
+					end: 11,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-right-1",
 				frames: this.anims.generateFrameNumbers("Player_one", {
+					start: 12,
+					end: 15,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-right-2",
+				frames: this.anims.generateFrameNumbers("Player_two", {
+					start: 12,
+					end: 15,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-right-3",
+				frames: this.anims.generateFrameNumbers("Player_three", {
+					start: 12,
+					end: 15,
+				}),
+				frameRate: 8,
+				repeat: -1,
+			});
+
+			this.anims.create({
+				key: "walk-right-4",
+				frames: this.anims.generateFrameNumbers("Player_four", {
 					start: 12,
 					end: 15,
 				}),
@@ -274,7 +402,7 @@ export default function PhaserGame() {
 						tileSize / 2,
 					PLAYER_TWO_DEFAULT_STATE.position.y * tileSize +
 						tileSize / 2,
-					"Player_one",
+					"Player_two",
 					8
 				),
 				state: PLAYER_TWO_DEFAULT_STATE,
@@ -286,7 +414,7 @@ export default function PhaserGame() {
 						tileSize / 2,
 					PLAYER_THREE_DEFAULT_STATE.position.y * tileSize +
 						tileSize / 2,
-					"Player_one",
+					"Player_three",
 					8
 				),
 				state: PLAYER_THREE_DEFAULT_STATE,
@@ -298,7 +426,7 @@ export default function PhaserGame() {
 						tileSize / 2,
 					PLAYER_FOUR_DEFAULT_STATE.position.y * tileSize +
 						tileSize / 2,
-					"Player_one",
+					"Player_four",
 					8
 				),
 				state: PLAYER_FOUR_DEFAULT_STATE,
@@ -404,7 +532,10 @@ export default function PhaserGame() {
 			playerObj.state.direction = nextPosition.direction;
 			playerObj.state.position = nextPosition;
 
-			playerObj.sprite.anims.play(`walk-${nextPosition.direction}`, true);
+			playerObj.sprite.anims.play(
+				`walk-${nextPosition.direction}-${playerObj.state.playerIndex}`,
+				true
+			);
 
 			scene.tweens.add({
 				targets: playerObj.sprite,
