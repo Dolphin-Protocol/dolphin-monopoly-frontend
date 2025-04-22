@@ -95,7 +95,12 @@ export default function GameLobby() {
       return;
     }
     try {
-      await startGame();
+      const playerAddresses = currentRoom?.members.map((member) => member.address);
+      if (!playerAddresses) {
+        toast.error("No players in the room");
+        return;
+      }
+      await startGame(playerAddresses);
       toast.success("Game started successfully");
     } catch (error) {
       console.error("Failed to start game:", error);

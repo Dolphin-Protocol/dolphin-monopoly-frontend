@@ -11,8 +11,7 @@ import { io, Socket } from "socket.io-client";
 import { Room } from "@/types/game";
 import { useCustomWallet } from "./WalletContext";
 
-// const SOCKET_URL = "http://5.183.11.9:3003";
-const SOCKET_URL = "http://localhost:3003";
+const SOCKET_URL = "http://5.183.11.9:3003";
 
 interface ServerToClientEvents {
   rooms: (data: { rooms: Room[] }) => void;

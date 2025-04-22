@@ -11,7 +11,7 @@ const MiniMap = () => {
 
 	if (!isOpen) {
 		return (
-			<div className="absolute top-6 left-6 z-50">
+			<div className="absolute top-4 left-4 z-50">
 				<Button
 					variant="default"
 					size="icon"
@@ -25,7 +25,7 @@ const MiniMap = () => {
 	}
 
 	return (
-		<div className="absolute top-6 left-6 z-50">
+		<div className="absolute top-4 left-4 z-50">
 			<Card className="relative overflow-hidden transition-all hover:shadow-lg border-primary bg-background/95 backdrop-blur shadow-xl rounded-xl">
 				<div className="absolute inset-0 bg-gradient-to-bl from-primary/10 to-transparent pointer-events-none" />
 				<div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-xl" />
