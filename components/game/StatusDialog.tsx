@@ -36,7 +36,7 @@ const StatusDialog: React.FC<GameStatusProps> = ({ messages }) => {
 				<div className="h-px w-full bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30" />
 			</CardHeader>
 
-			<CardContent className="space-y-3 pb-3 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent pr-1">
+			<CardContent className="space-y-3 pb-3 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
 				{messages.length === 0 ? (
 					<div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
 						<Info className="h-8 w-8 mb-2 opacity-40" />
