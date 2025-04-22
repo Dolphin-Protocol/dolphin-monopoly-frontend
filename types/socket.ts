@@ -16,6 +16,7 @@ export type HouseCell = {
     position: number;
 }
 
+// 每個動作之後需要回傳的資料
 export type PlayerState = {
 	playerId: string;
 	playerAddress: string;
@@ -25,8 +26,11 @@ export type PlayerState = {
 	playerHouse: HouseCell[];
 };
 
+// 每個動作之後需要回傳的資料
 export type GameState = {
     roomInfo: RoomInfo;
     playerState: PlayerState;
     houseCell: HouseCell[];
 }
+
+// 需要有一個 mock socket 來測試連線以及更新地圖狀態
