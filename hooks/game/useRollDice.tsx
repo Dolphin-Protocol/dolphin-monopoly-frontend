@@ -3,7 +3,7 @@
 
 import { useCallback, useState } from "react";
 import { useCustomWallet } from "@/contexts/WalletContext";
-import { useGameContext } from "@/contexts/GameContext";
+import { useGameActionContext } from "@/contexts/GameActionContext";
 import { TurnCap } from "@sui-dolphin/monopoly-sdk/_generated/monopoly/monopoly/structs";
 
 interface UseRollDiceReturn {
@@ -15,7 +15,7 @@ interface UseRollDiceReturn {
 export const useRollDice = (): UseRollDiceReturn => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const { game, setGameLoading, setGameError } = useGameContext();
+	const { game, setGameLoading, setGameError } = useGameActionContext();
 	const { address, sponsorAndExecuteTransactionBlock } = useCustomWallet();
 
 	const rollDice = useCallback(
@@ -45,6 +45,7 @@ export const useRollDice = (): UseRollDiceReturn => {
 				});
 
 				// 解析骰子事件
+				// 這邊應該會由 socket 來處理
 				const rollDiceEvents = game.parseRollDiceEvent(result);
 				return rollDiceEvents;
 			} catch (err: any) {

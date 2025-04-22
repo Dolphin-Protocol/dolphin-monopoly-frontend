@@ -3,7 +3,7 @@
 
 import { useCallback, useState } from "react";
 import { useCustomWallet } from "@/contexts/WalletContext";
-import { useGameContext } from "@/contexts/GameContext";
+import { useGameActionContext } from "@/contexts/GameActionContext";
 import { useSuiClient } from "@mysten/dapp-kit";
 import { Action } from "@sui-dolphin/monopoly-sdk";
 
@@ -17,7 +17,7 @@ export const useBuyHouse = (): UseBuyHouseReturn => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const { game } = useGameContext();
+	const { game } = useGameActionContext();
 	const { address, sponsorAndExecuteTransactionBlock } = useCustomWallet();
 	const suiClient = useSuiClient();
 
@@ -65,6 +65,7 @@ export const useBuyHouse = (): UseBuyHouseReturn => {
 				});
 
 				// 解析購買事件
+				// 這邊應該會由 socket 來處理
 				const buyEvents =
 					game.parsePlayerBuyOrUpgradeEvent(result);
 

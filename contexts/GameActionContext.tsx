@@ -13,7 +13,7 @@ import { useCustomWallet } from "@/contexts/WalletContext";
 import { useSuiClient } from "@mysten/dapp-kit";
 import { MonopolyGame, getOwnedGames } from "@sui-dolphin/monopoly-sdk";
 
-interface GameContextType {
+interface GameActionContextType {
 	game: MonopolyGame | null;
 	isLoading: boolean;
 	error: string | null;
@@ -22,7 +22,7 @@ interface GameContextType {
 	setGameLoading: (loading: boolean) => void;
 }
 
-const GameContext = createContext<GameContextType>({
+const GameActionContext = createContext<GameActionContextType>({
 	game: null,
 	isLoading: false,
 	error: null,
@@ -31,9 +31,9 @@ const GameContext = createContext<GameContextType>({
 	setGameLoading: () => {},
 });
 
-export const useGameContext = () => useContext(GameContext);
+export const useGameActionContext = () => useContext(GameActionContext);
 
-export const GameProvider = ({ children }: { children: ReactNode }) => {
+export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 	const [game, setGame] = useState<MonopolyGame | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -73,7 +73,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 	}, [address, game, fetchGame]);
 
 	return (
-		<GameContext.Provider
+		<GameActionContext.Provider
 			value={{
 				game,
 				isLoading,
@@ -84,6 +84,6 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 			}}
 		>
 			{children}
-		</GameContext.Provider>
+		</GameActionContext.Provider>
 	);
 };
