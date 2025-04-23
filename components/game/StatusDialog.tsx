@@ -53,9 +53,7 @@ const StatusDialog: React.FC<GameStatusProps> = ({ messages }) => {
 							</div>
 							<div className="flex-1">
 								<p className="text-sm">{message}</p>
-								<p className="text-xs text-muted-foreground mt-1">
-									{new Date().toLocaleTimeString()}
-								</p>
+								
 							</div>
 						</div>
 					))

@@ -37,33 +37,36 @@ export interface ExecuteSponsoredTransactionApiInput {
 	signature: string;
 }
 
-interface SponsorAndExecuteTransactionBlockProps {
-	tx: Transaction;
-	network: "mainnet" | "testnet";
-	options: SuiTransactionBlockResponseOptions;
-	includesTransferTx: boolean;
-	allowedAddresses?: string[];
+// 修改接口名稱
+interface SponsorAndExecuteTransactionProps {
+  tx: Transaction;
+  network: "mainnet" | "testnet";
+  options: SuiTransactionBlockResponseOptions;
+  includesTransferTx: boolean;
+  allowedAddresses?: string[];
 }
 
-interface ExecuteTransactionBlockWithoutSponsorshipProps {
-	tx: Transaction;
-	options: SuiTransactionBlockResponseOptions;
+interface ExecuteTransactionWithoutSponsorshipProps {
+  tx: Transaction;
+  options: SuiTransactionBlockResponseOptions;
 }
+
 interface CustomWalletContextProps {
-	isConnected: boolean;
-	isUsingEnoki: boolean;
-	address?: string;
-	jwt?: string;
-	emailAddress: string | null;
-	getAddressSeed: () => Promise<string>;
-	sponsorAndExecuteTransactionBlock: (
-		props: SponsorAndExecuteTransactionBlockProps
-	) => Promise<SuiTransactionBlockResponse>;
-	executeTransactionBlockWithoutSponsorship: (
-		props: ExecuteTransactionBlockWithoutSponsorshipProps
-	) => Promise<SuiTransactionBlockResponse | void>;
-	logout: () => void;
-	redirectToAuthUrl: () => void;
+  isConnected: boolean;
+  isUsingEnoki: boolean;
+  address?: string;
+  jwt?: string;
+  emailAddress: string | null;
+  getAddressSeed: () => Promise<string>;
+  // 更新方法名稱
+  sponsorAndExecuteTransaction: (
+    props: SponsorAndExecuteTransactionProps
+  ) => Promise<SuiTransactionBlockResponse>;
+  executeTransactionWithoutSponsorship: (
+    props: ExecuteTransactionWithoutSponsorshipProps
+  ) => Promise<SuiTransactionBlockResponse | void>;
+  logout: () => void;
+  redirectToAuthUrl: () => void;
 }
 
 export const useCustomWallet = () => {
@@ -78,10 +81,11 @@ export const CustomWalletContext = createContext<CustomWalletContextProps>({
 	jwt: undefined,
 	emailAddress: null,
 	getAddressSeed: async () => "",
-	sponsorAndExecuteTransactionBlock: async () => {
+	// 更新方法名稱
+	sponsorAndExecuteTransaction: async () => {
 		throw new Error("Not implemented");
 	},
-	executeTransactionBlockWithoutSponsorship: async () => {},
+	executeTransactionWithoutSponsorship: async () => {},
 	logout: () => {},
 	redirectToAuthUrl: () => {},
 });
@@ -200,13 +204,13 @@ export default function CustomWalletProvider({
 		}).then((resp) => resp.signature);
 	};
 
-	const sponsorAndExecuteTransactionBlock = async ({
+	const sponsorAndExecuteTransaction = async ({
 		tx,
 		network,
 		options,
 		includesTransferTx,
 		allowedAddresses = [],
-	}: SponsorAndExecuteTransactionBlockProps): Promise<SuiTransactionBlockResponse> => {
+	}: SponsorAndExecuteTransactionProps): Promise<SuiTransactionBlockResponse> => {
 		if (!isConnected) {
 			throw new Error("Wallet is not connected");
 		}
@@ -266,10 +270,10 @@ export default function CustomWalletProvider({
 	// some transactions cannot be sponsored by Enoki in its current state
 	// for example when want to use the gas coin as an argument in a move call
 	// so we provide an additional method to execute transactions without sponsorship
-	const executeTransactionBlockWithoutSponsorship = async ({
+	const executeTransactionWithoutSponsorship = async ({
 		tx,
 		options,
-	}: ExecuteTransactionBlockWithoutSponsorshipProps): Promise<SuiTransactionBlockResponse | void> => {
+	}: ExecuteTransactionWithoutSponsorshipProps): Promise<SuiTransactionBlockResponse | void> => {
 		if (!isConnected) {
 			return;
 		}
@@ -292,8 +296,8 @@ export default function CustomWalletProvider({
 				address,
 				jwt: zkLoginSession?.jwt,
 				emailAddress,
-				sponsorAndExecuteTransactionBlock,
-				executeTransactionBlockWithoutSponsorship,
+				sponsorAndExecuteTransaction,
+				executeTransactionWithoutSponsorship,
 				logout,
 				redirectToAuthUrl,
 				getAddressSeed,
