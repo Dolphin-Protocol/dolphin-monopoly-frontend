@@ -41,7 +41,7 @@ export const useBuyHouse = (): UseBuyHouseReturn => {
 				// 獲取當前的購買請求
 				const requests = await game.getOwnedActionRequest(
 					suiClient,
-					game.game.id,
+					address,
 					Action.BUY_OR_UPGRADE
 				);
 
