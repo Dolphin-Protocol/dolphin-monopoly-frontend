@@ -205,6 +205,7 @@ export const useLobby = (): UseLobbyReturn => {
 				}
 
 				// 初始化遊戲，並等待結果
+        // init 應該在後端
 				const gameResult = await initGame(addressesToUse);
 
 				if (!gameResult) {

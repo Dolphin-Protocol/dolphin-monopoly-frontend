@@ -57,6 +57,7 @@ function createAdminKeypair() {
 	}
 }
 
+// 這邊應該是後端處理
 export const useInitGame = (): UseInitGameReturn => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);

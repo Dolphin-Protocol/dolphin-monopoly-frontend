@@ -39,12 +39,16 @@ export const useBuyHouse = (): UseBuyHouseReturn => {
 
 			try {
 				// 獲取當前的購買請求
+				// 後端需要回傳適當的資料
 				const requests = await game.getOwnedActionRequest(
 					suiClient,
 					address,
 					Action.BUY_OR_UPGRADE
 				);
 
+				console.log("requests", requests);
+
+				// 為什麼是 array 哪一個是哪一個
 				if (requests.length === 0) {
 					setError("No buy request available");
 					return null;
