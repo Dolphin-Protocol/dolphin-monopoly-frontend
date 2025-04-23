@@ -19,6 +19,7 @@ export const useRollDice = (): UseRollDiceReturn => {
 	const { address, executeTransactionWithoutSponsorship } = useCustomWallet();
 
 	const rollDice = useCallback(async () => {
+		console.log("rollDice");
 		if (!game) {
 			setError("No active game");
 			return null;

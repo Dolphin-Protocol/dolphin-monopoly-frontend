@@ -149,12 +149,12 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {
 		// 固定的遊戲ID
 		const gameId =
-			"0xa2fab87d02a3650bbbf2c2467abd9e8a3a9c491c6acbc5ea4d17497352dfff73";
+			"0x3cf4a59c212e2e22b4fab7f2d144835660b6700768a5295a8618ea0b2d99a4a2";
 		fetchGameById(gameId);
 
 		// 固定的 TurnCap ID
 		const turnCapId =
-			"0x9581b7bcdb68cb25dae3be11c99ea775e0e1e48f72399307fe7e730b153f523c";
+			"0xad49c2ba35a6547fcc7501bbb1ed1bb83dd16cf93461b0297fc6244a1414742b";
 		fetchTurnCapById(turnCapId);
 	}, [fetchGameById, fetchTurnCapById]);
 

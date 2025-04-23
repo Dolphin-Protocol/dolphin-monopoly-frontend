@@ -18,7 +18,7 @@ export const useBuyHouse = (): UseBuyHouseReturn => {
 	const [error, setError] = useState<string | null>(null);
 
 	const { game } = useGameActionContext();
-	const { address, sponsorAndExecuteTransactionBlock } = useCustomWallet();
+	const { address, executeTransactionWithoutSponsorship } = useCustomWallet();
 	const suiClient = useSuiClient();
 
 	// 執行購買操作
@@ -41,7 +41,7 @@ export const useBuyHouse = (): UseBuyHouseReturn => {
 				// 獲取當前的購買請求
 				const requests = await game.getOwnedActionRequest(
 					suiClient,
-					address,
+					game.game.id,
 					Action.BUY_OR_UPGRADE
 				);
 
@@ -57,15 +57,16 @@ export const useBuyHouse = (): UseBuyHouseReturn => {
 				);
 
 				// 執行交易
-				const result = await sponsorAndExecuteTransactionBlock({
+				const result = await executeTransactionWithoutSponsorship({
 					tx: ptb,
-					network: "testnet",
 					options: { showEvents: true },
-					includesTransferTx: true,
 				});
 
 				// 解析購買事件
 				// 這邊應該會由 socket 來處理
+				if (!result) {
+					throw new Error("Failed to execute buy");
+				}
 				const buyEvents =
 					game.parsePlayerBuyOrUpgradeEvent(result);
 
@@ -78,7 +79,7 @@ export const useBuyHouse = (): UseBuyHouseReturn => {
 				setIsLoading(false);
 			}
 		},
-		[game, address, suiClient, sponsorAndExecuteTransactionBlock]
+		[game, address, suiClient, executeTransactionWithoutSponsorship]
 	);
 
 	return {

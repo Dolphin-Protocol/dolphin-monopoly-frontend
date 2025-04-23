@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { Home, Coins, MapPin, Dice5 } from "lucide-react";
 import Dice from "react-dice-roll";
 import { useRollDice } from "@/hooks/game/useRollDice";
+import { useBuyHouse } from "@/hooks/game/useBuyHouse";
+
 interface GamepadProps {
   playerState: PlayerState;
   onRollDice: (value: number) => void;
@@ -28,6 +30,7 @@ const Gamepad: React.FC<GamepadProps> = ({
   const [isRolling, setIsRolling] = useState(false);
   const diceRef = useRef<any>(null);
   const { rollDice } = useRollDice();
+  const { executeBuy } = useBuyHouse();
 
   const handleRollClick = () => {
     setIsRolling(true);
@@ -40,6 +43,10 @@ const Gamepad: React.FC<GamepadProps> = ({
   const handleDiceRollComplete = (value: number) => {
     setIsRolling(false);
     onRollDice(value);
+  };
+
+  const handleBuyHouse = () => {
+    executeBuy(true);
   };
 
   return (
@@ -113,7 +120,7 @@ const Gamepad: React.FC<GamepadProps> = ({
         </div>
       </CardContent>
 
-      <CardFooter className="pt-0">
+      <CardFooter className="pt-0 flex flex-col gap-2">
         <Button
           onClick={handleRollClick}
           variant="default"
@@ -125,6 +132,7 @@ const Gamepad: React.FC<GamepadProps> = ({
           <Dice5 className="mr-2 h-5 w-5" />
           {isRolling ? "Rolling Dice..." : "Roll Dice"}
         </Button>
+        <Button onClick={handleBuyHouse} variant="default" size="lg" className="w-full">buy house</Button>
       </CardFooter>
     </Card>
   );

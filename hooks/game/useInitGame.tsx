@@ -148,34 +148,37 @@ export const useInitGame = (): UseInitGameReturn => {
 				const cells: { cell: TransactionResult; typeName: string }[] =
 					[];
 
-				// 創建 12 個格子的棋盤 (4x3)
-				for (let i = 0; i < 12; i++) {
-					if (i === 0 || i === 3 || i === 6 || i === 9) {
-						// 空閒格子 (角落格子)
-						const { cell, ptb: newPtb } = newIdleCell(
-							i.toString(),
+				const vec = [...Array(12).keys()];
+				vec.forEach((idx) => {
+					if (idx == 0 || idx == 3) {
+						// idle cell
+						const { cell, ptb: ptb_ } = newIdleCell(
+							idx.toString(),
 							ptb
 						);
 						cells.push({ typeName: Cell.$typeName, cell });
-						ptb = newPtb;
-					} else if (i === 2 || i === 8) {
-						// 機會格子
-						const { cell, ptb: newPtb } = chanceClass.newChanceCell(
+						ptb = ptb_;
+					} else if (idx == 6 || idx == 9) {
+						// chance cell
+						const { cell, ptb: ptb_ } = chanceClass.newChanceCell(
 							"chance",
 							ptb
 						);
-						cells.push({ typeName: ChanceCell.$typeName, cell });
-						ptb = newPtb;
+						cells.push({
+							typeName: ChanceCell.$typeName,
+							cell,
+						});
+						ptb = ptb_;
 					} else {
-						// 房屋格子
-						const { cell, ptb: newPtb } = houseClass.newCell(
-							i.toString(),
+						// hose cell
+						const { cell, ptb: ptb_ } = houseClass.newCell(
+							idx.toString(),
 							ptb
 						);
 						cells.push({ typeName: HouseCell.$typeName, cell });
-						ptb = newPtb;
+						ptb = ptb_;
 					}
-				}
+				});
 
 				// 3. 設置遊戲參數
 				const maxRound = BigInt(20);
@@ -195,7 +198,7 @@ export const useInitGame = (): UseInitGameReturn => {
 					salary,
 					cells,
 					initialFunds,
-					adminAddress, 
+					adminAddress,
 					ptb
 				);
 
