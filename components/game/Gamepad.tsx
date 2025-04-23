@@ -13,7 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Home, Coins, MapPin, Dice5 } from "lucide-react";
 import Dice from "react-dice-roll";
-
+import { useRollDice } from "@/hooks/game/useRollDice";
 interface GamepadProps {
   playerState: PlayerState;
   onRollDice: (value: number) => void;
@@ -27,9 +27,11 @@ const Gamepad: React.FC<GamepadProps> = ({
 }) => {
   const [isRolling, setIsRolling] = useState(false);
   const diceRef = useRef<any>(null);
+  const { rollDice } = useRollDice();
 
   const handleRollClick = () => {
     setIsRolling(true);
+    rollDice();
     if (diceRef.current) {
       diceRef.current.rollDice();
     }
@@ -117,7 +119,7 @@ const Gamepad: React.FC<GamepadProps> = ({
           variant="default"
           size="lg"
           className="w-full relative overflow-hidden group"
-          disabled={isRolling || !isTurn}
+          // disabled={isRolling || !isTurn}
         >
           <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 group-hover:translate-x-full transition-transform duration-700 ease-in-out -z-10" />
           <Dice5 className="mr-2 h-5 w-5" />

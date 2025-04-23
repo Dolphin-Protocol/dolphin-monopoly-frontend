@@ -32,7 +32,7 @@ export default function GamePage() {
 
   return (
     <div className="w-full h-full relative">
-      <GameCanvas />
+      {/* <GameCanvas /> */}
       <MiniMap />
       <Gamepad
         playerState={PLAYER_ONE_DEFAULT_STATE}

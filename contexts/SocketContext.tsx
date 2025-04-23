@@ -74,7 +74,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       socket.disconnect();
     }
 
-    console.log("正在初始化 Socket 连接...");
     setIsConnecting(true);
     setConnectionError("");
 
@@ -93,7 +92,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   };
 
   const reconnect = () => {
-    console.log("手动重连 Socket...");
     initSocket();
   };
 
