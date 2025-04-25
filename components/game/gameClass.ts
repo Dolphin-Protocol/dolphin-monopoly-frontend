@@ -32,6 +32,7 @@ class MonopolyScene extends Phaser.Scene {
 	playerStates: PlayerState[];
 	players: Player[];
 	currentPlayerIndex: number;
+	houseSprites: Phaser.GameObjects.Sprite[] = [];
 
 	constructor(
 		socket: Socket,
@@ -220,6 +221,7 @@ class MonopolyScene extends Phaser.Scene {
 
 				this.createAnimations();
 				this.initializePlayers();
+				this.initializeHouses();
 				this.setupControls();
 				this.setupSocketListeners();
 			}
@@ -402,6 +404,36 @@ class MonopolyScene extends Phaser.Scene {
 
 		this.players = [playerOne, playerTwo, playerThree, playerFour];
 		this.cameras.main.startFollow(playerOne.sprite);
+	}
+
+	initializeHouses() {
+		// 清除现有的房屋精灵
+		this.houseSprites.forEach((sprite) => sprite.destroy());
+		this.houseSprites = [];
+
+		// 遍历所有玩家
+		this.players.forEach((player, playerIndex) => {
+			// 从 player.state 获取房屋信息
+			if (
+				player.state.ownedHouses &&
+				player.state.ownedHouses.length > 0
+			) {
+				player.state.ownedHouses.forEach((house) => {
+					// 创建房屋精灵
+					const houseSprite = this.add.sprite(
+						house.x * tileSize,
+						house.y * tileSize,
+						`House_Level_${house.level || 1}`,
+						playerIndex
+					);
+					houseSprite.setOrigin(0.5, 0.5);
+
+					// ... 动画和其他设置
+
+					this.houseSprites.push(houseSprite);
+				});
+			}
+		});
 	}
 
 	setupControls() {

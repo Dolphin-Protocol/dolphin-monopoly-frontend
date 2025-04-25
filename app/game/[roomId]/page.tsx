@@ -7,7 +7,6 @@ import { PLAYER_ONE_DEFAULT_STATE } from "@/constants/states";
 import StatusDialog from "@/components/game/StatusDialog";
 import { useGame } from "@/contexts/GameContext";
 import { useSocket } from "@/contexts/SocketContext";
-import { ApiPlayerState } from "@/types/socket";
 
 import { useState } from "react";
 import { initializeDefaultPlayers } from "@/utils/gameAdapter";

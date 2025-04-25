@@ -30,8 +30,8 @@ export const mockRoomData: ApiRoomData = {
 		},
 		{
 			id: "0xc8f8d84ff36329addec84b32a95b47c36c581ea9c5e77e68b2c2f71c7116287b",
-			owner: null,
-			level: 0,
+			owner: "0x56562324e35bd4b84f0ef3d6bd0b9b7ec6b1584d37731990c36e2848bcacd659",
+			level: 1,
 			position: 1,
 			buyPrice: [
 				{ level: 1, price: "20" },
@@ -51,8 +51,8 @@ export const mockRoomData: ApiRoomData = {
 		},
 		{
 			id: "0x1a17266e6e4df36d1e892959953259501091ac9ad69c8e76c610bfe12927d56e",
-			owner: null,
-			level: 0,
+			owner: "0x7c0bf358836ef1232b662095a306f231034a6ec028dbaa1d7bc960bab59378db",
+			level: 1,
 			position: 2,
 			buyPrice: [
 				{ level: 1, price: "30" },
