@@ -16,6 +16,7 @@ import {
 } from "@/constants/paths";
 import { PLAYER_FOUR_PATH } from "@/constants/paths";
 import { HOUSE_POSITIONS } from "@/constants/houses";
+
 type Player = {
 	sprite: Phaser.GameObjects.Sprite;
 	state: PlayerState;

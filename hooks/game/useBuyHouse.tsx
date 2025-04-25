@@ -40,6 +40,7 @@ export const useBuyHouse = (): UseBuyHouseReturn => {
 			try {
 				// 獲取當前的購買請求
 				// 後端需要回傳適當的資料
+				// objectid
 				const requests = await game.getOwnedActionRequest(
 					suiClient,
 					address,

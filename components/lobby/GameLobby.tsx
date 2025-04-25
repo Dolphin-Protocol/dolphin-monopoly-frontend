@@ -89,18 +89,8 @@ export default function GameLobby() {
   };
 
   const handleStartGame = async () => {
-    console.log("handleStartGame");
-    if (!address) {
-      toast.error("Please connect your wallet to start a game");
-      return;
-    }
     try {
-      const playerAddresses = currentRoom?.members.map((member) => member.address);
-      if (!playerAddresses) {
-        toast.error("No players in the room");
-        return;
-      }
-      await startGame(playerAddresses);
+      await startGame( );
       toast.success("Game started successfully");
     } catch (error) {
       console.error("Failed to start game:", error);

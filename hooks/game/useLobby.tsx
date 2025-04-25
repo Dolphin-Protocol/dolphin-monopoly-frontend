@@ -5,7 +5,6 @@ import { useSocket } from "@/contexts/SocketContext";
 import { Room } from "@/types/game";
 import { useCustomWallet } from "@/contexts/WalletContext";
 import { useRouter } from "next/navigation";
-import { useInitGame } from "./useInitGame";
 
 interface UseLobbyReturn {
   isConnecting: boolean;
@@ -19,7 +18,7 @@ interface UseLobbyReturn {
   joinRoom: (address: string, roomId: string) => Promise<Room>;
   leaveRoom: () => Promise<Room>;
   disconnect: () => void;
-  startGame: (playerAddresses: string[]) => Promise<void>;
+  startGame: () => Promise<void>;
 }
 
 export const useLobby = (): UseLobbyReturn => {
@@ -35,7 +34,6 @@ export const useLobby = (): UseLobbyReturn => {
   const [isGameStarting, setIsGameStarting] = useState(false);
   const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
   const { address } = useCustomWallet();
-  const { initGame } = useInitGame();
 
   // Function to fetch room list
   const fetchRooms = useCallback(() => {
@@ -185,47 +183,20 @@ export const useLobby = (): UseLobbyReturn => {
   }, [socket]);
 
   const startGame = useCallback(
-		async (playerAddresses: string[] = []): Promise<void> => {
+		async (): Promise<void> => {
 			try {
 				if (!socketIsConnected || !socket) {
 					throw new Error("WebSocket is not connected");
 				}
 
-				// 確保至少包含當前用戶的地址
-				const addressesToUse =
-					playerAddresses.length > 0
-						? playerAddresses
-						: address
-						? [address]
-						: [];
-
-				// 如果沒有地址，拋出錯誤
-				if (addressesToUse.length === 0) {
-					throw new Error("No player addresses available");
-				}
-
-				// 初始化遊戲，並等待結果
-        // init 應該在後端
-				const gameResult = await initGame(addressesToUse);
-
-				if (!gameResult) {
-					throw new Error("Failed to initialize game");
-				}
-
 				// 通知其他玩家遊戲已開始
 				socket.emit("startGame");
-
-				// 成功建立遊戲
-				console.log(
-					"Game started successfully with players:",
-					addressesToUse
-				);
 			} catch (error) {
 				console.error("Failed to start game:", error);
 				throw error; // 重新拋出錯誤，讓調用者可以處理
 			}
 		},
-		[socketIsConnected, socket, address, initGame]
+		[socketIsConnected, socket]
   );
 
   return {
