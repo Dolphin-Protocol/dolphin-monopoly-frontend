@@ -5,9 +5,8 @@ import MiniMap from "@/components/game/MiniMap";
 import Gamepad from "@/components/game/Gamepad";
 import { PLAYER_ONE_DEFAULT_STATE } from "@/constants/states";
 import StatusDialog from "@/components/game/StatusDialog";
-import { useEffect } from "react";
-import { useInitGame } from "@/hooks/game/useInitGame";
 import { useGame } from "@/contexts/GameContext";
+import { useSocket } from "@/contexts/SocketContext";
 
 const messages = [
   "Player moved to Go, collect 200 coins",
@@ -24,15 +23,11 @@ const messages = [
 
 export default function GamePage() {
   const { isTurn } = useGame();
-	// const { initGame } = useInitGame();
-
-	// useEffect(() => {
-	// 	initGame(["0x1", "0x2", "0x3", "0x4"]);
-	// }, [initGame]);
+  const { socket } = useSocket();
 
   return (
     <div className="w-full h-full relative">
-      {/* <GameCanvas /> */}
+      <GameCanvas players={[]} currentPlayerIndex={0} socket={socket} />
       <MiniMap />
       <Gamepad
         playerState={PLAYER_ONE_DEFAULT_STATE}

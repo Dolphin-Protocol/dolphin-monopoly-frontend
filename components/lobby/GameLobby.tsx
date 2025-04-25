@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useLobby } from "@/hooks/game/useLobby";
 import { LobbyHeader } from "./LobbyHeader";
 import { SearchBar } from "./SearchBar";
@@ -10,8 +9,6 @@ import { useCustomWallet } from "@/contexts/WalletContext";
 import { toast } from "sonner";
 
 export default function GameLobby() {
-  const router = useRouter();
-
   const { address } = useCustomWallet();
 
   const {
