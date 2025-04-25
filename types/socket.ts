@@ -1,36 +1,45 @@
-import { Action } from "./game";
-
-export type RoomInfo = {
-    roomId: string;
-    turnId: string;
-    gameId: string;
-    gameState: string;
+// 游戏房间信息类型
+export interface ApiRoomInfo {
+  roomId: string;
+  gameId: string;
+  gameState: "started" | "waiting" | "ended"; // 可根据实际情况扩展
 }
 
-export type HouseCell = {
-    id: string;
-    level: number;
-    buyPrice: number;
-    sellPrice: number;
-    rent: number;
-    position: number;
+// 玩家状态类型
+export interface ApiPlayerState {
+  balance: number;
+  position: number;
 }
 
-// 每個動作之後需要回傳的資料
-export type PlayerState = {
-	playerId: string;
-	playerAddress: string;
-	playerPosition: number;
-	playerAsset: number;
-	playerAction: Action;
-	playerHouse: HouseCell[];
-};
-
-// 每個動作之後需要回傳的資料
-export type GameState = {
-    roomInfo: RoomInfo;
-    playerState: PlayerState;
-    houseCell: HouseCell[];
+// 价格类型
+export interface ApiPriceLevel {
+  level: number;
+  price: string;
 }
 
-// 需要有一個 mock socket 來測試連線以及更新地圖狀態
+// 房产单元类型
+export interface ApiPropertyCell {
+  id: string;
+  owner: string | null;
+  level: number;
+  position: number;
+  buyPrice: ApiPriceLevel[];
+  sellPrice: ApiPriceLevel[];
+  rentPrice: ApiPriceLevel[];
+}
+
+// 非房产单元类型（如起点、事件格等）
+export interface ApiNonPropertyCell {
+  id: string;
+  position: number;
+}
+
+// 联合类型表示任意单元格
+export type ApiHouseCell = ApiPropertyCell | ApiNonPropertyCell;
+
+// 完整的房间数据类型
+export interface ApiRoomData {
+  roomInfo: ApiRoomInfo;
+  playersState: Record<string, ApiPlayerState>;
+  houseCell: ApiHouseCell[];
+}

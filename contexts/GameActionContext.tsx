@@ -146,17 +146,17 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 		[suiClient]
 	);
 
-	useEffect(() => {
-		// 固定的遊戲ID
-		const gameId =
-			"0x3cf4a59c212e2e22b4fab7f2d144835660b6700768a5295a8618ea0b2d99a4a2";
-		fetchGameById(gameId);
+	// useEffect(() => {
+	// 	// 固定的遊戲ID
+	// 	const gameId =
+	// 		"0x3cf4a59c212e2e22b4fab7f2d144835660b6700768a5295a8618ea0b2d99a4a2";
+	// 	fetchGameById(gameId);
 
-		// 固定的 TurnCap ID
-		const turnCapId =
-			"0xad49c2ba35a6547fcc7501bbb1ed1bb83dd16cf93461b0297fc6244a1414742b";
-		fetchTurnCapById(turnCapId);
-	}, [fetchGameById, fetchTurnCapById]);
+	// 	// 固定的 TurnCap ID
+	// 	const turnCapId =
+	// 		"0xad49c2ba35a6547fcc7501bbb1ed1bb83dd16cf93461b0297fc6244a1414742b";
+	// 	fetchTurnCapById(turnCapId);
+	// }, [fetchGameById, fetchTurnCapById]);
 
 	return (
 		<GameActionContext.Provider

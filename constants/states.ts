@@ -4,8 +4,9 @@ import { PLAYER_ONE_PATH, PLAYER_TWO_PATH, PLAYER_THREE_PATH, PLAYER_FOUR_PATH }
 export const PLAYER_ONE_DEFAULT_STATE: PlayerState = {
 	playerIndex: 1,
 	positionIndex: 0,
+	address: "",
 	direction: "left",
-	ownedHouses: [],
+	ownedHouses: [],	
 	assets: 1000,
 	position: PLAYER_ONE_PATH[0],
 };
@@ -13,6 +14,7 @@ export const PLAYER_ONE_DEFAULT_STATE: PlayerState = {
 export const PLAYER_TWO_DEFAULT_STATE: PlayerState = {
 	playerIndex: 2,
 	positionIndex: 0,
+	address: "",
 	direction: "left",
 	ownedHouses: [],
 	assets: 1000,
@@ -22,6 +24,7 @@ export const PLAYER_TWO_DEFAULT_STATE: PlayerState = {
 export const PLAYER_THREE_DEFAULT_STATE: PlayerState = {
 	playerIndex: 3,
 	positionIndex: 0,
+	address: "",
 	direction: "left",
 	ownedHouses: [],
 	assets: 1000,
@@ -31,6 +34,7 @@ export const PLAYER_THREE_DEFAULT_STATE: PlayerState = {
 export const PLAYER_FOUR_DEFAULT_STATE: PlayerState = {
 	playerIndex: 4,
 	positionIndex: 0,
+	address: "",
 	direction: "left",
 	ownedHouses: [],
 	assets: 1000,

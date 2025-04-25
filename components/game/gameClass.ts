@@ -29,13 +29,19 @@ const tileSize = 16;
 // 這邊需要改型別，並且不用 index 去判斷玩家，而是使用地址
 class MonopolyScene extends Phaser.Scene {
 	socket: Socket;
+	playerStates: PlayerState[];
 	players: Player[];
 	currentPlayerIndex: number;
 
-	constructor(socket: Socket, players: Player[], currentPlayerIndex: number) {
+	constructor(
+		socket: Socket,
+		playerStates: PlayerState[],
+		currentPlayerIndex: number
+	) {
 		super("MonopolyScene");
 		this.socket = socket;
-		this.players = players;
+		this.playerStates = playerStates;
+		this.players = [];
 		this.currentPlayerIndex = currentPlayerIndex;
 	}
 
@@ -317,45 +323,81 @@ class MonopolyScene extends Phaser.Scene {
 		camera.setZoom(4);
 		camera.setBounds(0, 0, this.game.canvas.width, this.game.canvas.height);
 
-		// 創建玩家精靈
+		// 根据方向获取对应的帧索引
+		const getFrameByDirection = (direction: string): number => {
+			switch (direction) {
+				case "down":
+					return 0;
+				case "up":
+					return 4;
+				case "left":
+					return 8;
+				case "right":
+					return 12;
+				default:
+					return 8; // 默认为左
+			}
+		};
+
+		// 使用传入的状态，如果没有则使用默认状态
+		const playerOneState =
+			this.playerStates && this.playerStates.length > 0
+				? this.playerStates[0]
+				: PLAYER_ONE_DEFAULT_STATE;
+
+		const playerTwoState =
+			this.playerStates && this.playerStates.length > 1
+				? this.playerStates[1]
+				: PLAYER_TWO_DEFAULT_STATE;
+
+		const playerThreeState =
+			this.playerStates && this.playerStates.length > 2
+				? this.playerStates[2]
+				: PLAYER_THREE_DEFAULT_STATE;
+
+		const playerFourState =
+			this.playerStates && this.playerStates.length > 3
+				? this.playerStates[3]
+				: PLAYER_FOUR_DEFAULT_STATE;
+
 		const playerOne = {
 			sprite: this.add.sprite(
-				PLAYER_ONE_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
-				PLAYER_ONE_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
+				playerOneState.position.x * tileSize + tileSize / 2,
+				playerOneState.position.y * tileSize + tileSize / 2,
 				"Player_one",
-				8
+				getFrameByDirection(playerOneState.direction)
 			),
-			state: PLAYER_ONE_DEFAULT_STATE,
+			state: playerOneState,
 		};
 
 		const playerTwo = {
 			sprite: this.add.sprite(
-				PLAYER_TWO_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
-				PLAYER_TWO_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
+				playerTwoState.position.x * tileSize + tileSize / 2,
+				playerTwoState.position.y * tileSize + tileSize / 2,
 				"Player_two",
-				8
+				getFrameByDirection(playerTwoState.direction)
 			),
-			state: PLAYER_TWO_DEFAULT_STATE,
+			state: playerTwoState,
 		};
 
 		const playerThree = {
 			sprite: this.add.sprite(
-				PLAYER_THREE_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
-				PLAYER_THREE_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
+				playerThreeState.position.x * tileSize + tileSize / 2,
+				playerThreeState.position.y * tileSize + tileSize / 2,
 				"Player_three",
-				8
+				getFrameByDirection(playerThreeState.direction)
 			),
-			state: PLAYER_THREE_DEFAULT_STATE,
+			state: playerThreeState,
 		};
 
 		const playerFour = {
 			sprite: this.add.sprite(
-				PLAYER_FOUR_DEFAULT_STATE.position.x * tileSize + tileSize / 2,
-				PLAYER_FOUR_DEFAULT_STATE.position.y * tileSize + tileSize / 2,
+				playerFourState.position.x * tileSize + tileSize / 2,
+				playerFourState.position.y * tileSize + tileSize / 2,
 				"Player_four",
-				8
+				getFrameByDirection(playerFourState.direction)
 			),
-			state: PLAYER_FOUR_DEFAULT_STATE,
+			state: playerFourState,
 		};
 
 		this.players = [playerOne, playerTwo, playerThree, playerFour];

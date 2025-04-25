@@ -3,14 +3,15 @@
 import React, { useEffect, useRef } from "react";
 import Phaser from "phaser";
 import { Socket } from "socket.io-client";
-import MonopolyScene, { Player } from "./gameClass";
+import MonopolyScene from "./gameClass";
+import { PlayerState } from "@/types/game";
 
 export default function PhaserGame({
 	players,
 	currentPlayerIndex,
 	socket,
 }: {
-	players: Player[];
+	players: PlayerState[];
 	currentPlayerIndex: number;
 	socket: Socket;
 }) {
@@ -35,6 +36,9 @@ export default function PhaserGame({
 				arcade: {
 					gravity: { y: 0, x: 0 },
 				},
+			},
+			audio: {
+				noAudio: true,
 			},
 			scene: [new MonopolyScene(socket, players, currentPlayerIndex)],
 		};
