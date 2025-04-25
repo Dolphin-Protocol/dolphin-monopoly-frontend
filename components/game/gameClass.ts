@@ -25,6 +25,8 @@ export type Player = {
 const tileSize = 16;
 
 // 定義一個完整的遊戲場景類
+
+// 這邊需要改型別，並且不用 index 去判斷玩家，而是使用地址
 class MonopolyScene extends Phaser.Scene {
 	socket: Socket;
 	players: Player[];

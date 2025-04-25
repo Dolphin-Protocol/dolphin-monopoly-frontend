@@ -1,6 +1,6 @@
 "use client";
 
-import GameCanvas from "@/components/game/GameCanvas";
+import PhaserGame from "@/components/game/PhaserGame";
 import MiniMap from "@/components/game/MiniMap";
 import Gamepad from "@/components/game/Gamepad";
 import { PLAYER_ONE_DEFAULT_STATE } from "@/constants/states";
@@ -26,15 +26,15 @@ export default function GamePage() {
   const { socket } = useSocket();
 
   return (
-    <div className="w-full h-full relative">
-      <GameCanvas players={[]} currentPlayerIndex={0} socket={socket} />
-      <MiniMap />
-      <Gamepad
-        playerState={PLAYER_ONE_DEFAULT_STATE}
-        onRollDice={() => {}}
-        isTurn={isTurn}
-      />
-      <StatusDialog messages={messages} />
-    </div>
+		<div className="w-full h-full relative">
+			<PhaserGame players={[]} currentPlayerIndex={0} socket={socket} />
+			<MiniMap />
+			<Gamepad
+				playerState={PLAYER_ONE_DEFAULT_STATE}
+				onRollDice={() => {}}
+				isTurn={isTurn}
+			/>
+			<StatusDialog messages={messages} />
+		</div>
   );
 }
