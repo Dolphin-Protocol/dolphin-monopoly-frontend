@@ -6,12 +6,12 @@ import Gamepad from "@/components/game/Gamepad";
 import { PLAYER_ONE_DEFAULT_STATE } from "@/constants/states";
 import StatusDialog from "@/components/game/StatusDialog";
 import { useGame } from "@/contexts/GameContext";
-import { useSocket } from "@/contexts/SocketContext";
 
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { initializeDefaultPlayers } from "@/utils/gameAdapter";
-import { mockRoomData } from "@/mock/rooms";
 import { PlayerState } from "@/types/game";
+import { useSocket } from "@/contexts/SocketContext";
 
 const messages = [
 	"Player moved to Go, collect 200 coins",
@@ -27,12 +27,16 @@ const messages = [
 ];
 
 export default function GamePage() {
-	const { isTurn } = useGame();
+	const { isTurn, roomData } = useGame();
 	const { socket } = useSocket();
 
-	const [players, setPlayers] = useState<PlayerState[]>(() =>
-		initializeDefaultPlayers(mockRoomData)
-	);
+	const [players, setPlayers] = useState<PlayerState[]>([]);
+
+	useEffect(() => {
+		if (!roomData) return;
+		const players = initializeDefaultPlayers(roomData);
+		setPlayers(players);
+	}, [roomData]);
 
 	console.log(players);
 

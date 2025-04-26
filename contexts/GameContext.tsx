@@ -15,11 +15,10 @@ import { useParams } from "next/navigation";
 interface GameContextType {
   turnAddress: string | null;
   isTurn: boolean;
+  roomData: ApiRoomData | null;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
-
-const API_BASE_URL = "http://5.183.11.9:3003";
 
 export const useGame = () => {
   const context = useContext(GameContext);
@@ -42,47 +41,22 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [turnAddress, setTurnAddress] = useState<string | null>(null);
   const [isTurn, setIsTurn] = useState<boolean>(false);
   const [roomData, setRoomData] = useState<ApiRoomData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   const { roomId } = useParams<{ roomId: string }>();
 
-  console.log(roomId);
-
-  const fetchGameState = async () => {
-		if (!roomId) {
-			setError("Room ID is not found");
-			setLoading(false);
-			return;
-		}
-
-		try {
-			setLoading(true);
-			const response = await fetch(
-				`${API_BASE_URL}/monopoly/game-state?roomId=${roomId}`
-			);
-
-			if (!response.ok) {
-				throw new Error(`API request failed: ${response.status}`);
-			}
-
-			const data: ApiRoomData = await response.json();
-			console.log(data);
-			setRoomData(data);
-			setError(null);
-		} catch (err) {
-			setError(err instanceof Error ? err.message : "Failed to get game state");
-			console.error("Failed to get game state:", err);
-		} finally {
-			setLoading(false);
-		}
-  };
-
   useEffect(() => {
     if (!socket) return;
+    if (!roomId) return;
+
+    socket.emit("gameState", { roomId });
+
     socket.on("WsTurnEvent", (data) => {
       setTurnAddress(data.player);
       setIsTurn(data.player === address);
+    });
+    socket.on("gameState", (data) => {
+      if (!data) return;
+      setRoomData(data.gameState);
     });
 
     socket.on("error", (data) => {
@@ -93,11 +67,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       socket.off("WsTurnEvent");
       socket.off("error");
     };
-  }, [address, socket]);
-
-  useEffect(() => {
-    fetchGameState();
-  }, [roomId]);
+  }, [address, socket, roomId]);
 
   const value = {
     turnAddress,
