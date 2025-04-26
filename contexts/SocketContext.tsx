@@ -37,6 +37,7 @@ interface ServerToClientEvents {
 	gameStarted: () => void;
 	error: (data: { message: string }) => void;
 	gameState: (data: { gameState: ApiRoomData }) => void;
+	WsGameStartingEvent: () => void;
 	ChangeTurn: (data: { player: string }) => void;
 	Move: (data: { player: string; address: string }) => void;
 	ActionRequest: (data: { player: string; houseCell: HouseCell }) => void;
