@@ -220,7 +220,7 @@ class MonopolyScene extends Phaser.Scene {
 				);
 
 				this.createAnimations();
-				this.initializePlayers();
+				this.initializePlayers(map);
 				this.initializeHouses();
 				this.setupControls();
 				this.setupSocketListeners();
@@ -320,10 +320,12 @@ class MonopolyScene extends Phaser.Scene {
 		}
 	}
 
-	initializePlayers() {
+	initializePlayers(map: Phaser.Tilemaps.Tilemap) {
 		const camera = this.cameras.main;
 		camera.setZoom(4);
-		camera.setBounds(0, 0, this.game.canvas.width, this.game.canvas.height);
+
+		// 设置摄像机边界为地图的实际尺寸
+		camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
 		// 根据方向获取对应的帧索引
 		const getFrameByDirection = (direction: string): number => {

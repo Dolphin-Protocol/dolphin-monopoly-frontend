@@ -16,6 +16,9 @@ export default function PhaserGame({
 	socket: Socket;
 }) {
 	const gameRef = useRef<Phaser.Game | null>(null);
+	console.log(players);
+	console.log(currentPlayerIndex);
+	console.log(socket);
 
 	useEffect(() => {
 		// 如果已經有遊戲實例，先銷毀它
@@ -56,7 +59,6 @@ export default function PhaserGame({
 		<div
 			id="phaser-container"
 			className="w-full h-full relative"
-			style={{ minHeight: "500px" }}
 		/>
 	);
 }

@@ -4,7 +4,6 @@
 import { useCallback, useState } from "react";
 import { useCustomWallet } from "@/contexts/WalletContext";
 import { useGameActionContext } from "@/contexts/GameActionContext";
-import { TurnCap } from "@sui-dolphin/monopoly-sdk/_generated/monopoly/monopoly/structs";
 
 interface UseRollDiceReturn {
 	isLoading: boolean;

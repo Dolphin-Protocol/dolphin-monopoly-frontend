@@ -15,6 +15,8 @@ import {
 	TurnCap,
 } from "@sui-dolphin/monopoly-sdk/_generated/monopoly/monopoly/structs";
 import { fromBase64 } from "@mysten/sui/utils";
+import { useCustomWallet } from "./WalletContext";
+import { useGame } from "./GameContext";
 
 interface GameActionContextType {
 	game: MonopolyGame | null;
@@ -22,7 +24,7 @@ interface GameActionContextType {
 	isLoading: boolean;
 	error: string | null;
 	fetchGameById: (gameId: string) => Promise<MonopolyGame | null>;
-	fetchTurnCapById: (turnCapId: string) => Promise<TurnCap | null>;
+	fetchTurnCap: () => Promise<TurnCap | null>;
 	setError: (error: string | null) => void;
 	setIsLoading: (loading: boolean) => void;
 }
@@ -33,7 +35,7 @@ const GameActionContext = createContext<GameActionContextType>({
 	isLoading: false,
 	error: null,
 	fetchGameById: async () => null,
-	fetchTurnCapById: async () => null,
+	fetchTurnCap: async () => null,
 	setError: () => {},
 	setIsLoading: () => {},
 });
@@ -45,13 +47,20 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 	const [turnCap, setTurnCap] = useState<TurnCap | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const { address } = useCustomWallet();
+	const { roomData } = useGame();
 	const suiClient = useSuiClient();
 
 	// 通過ID獲取 TurnCap
-	const fetchTurnCapById = useCallback(
-		async (turnCapId: string) => {
-			if (!turnCapId) {
-				setError("No TurnCap ID provided");
+	const fetchTurnCap = useCallback(
+		async () => {
+			if (!game) {
+				setError("No game provided");
+				return null;
+			}
+
+			if (!address) {
+				setError("No address provided");
 				return null;
 			}
 
@@ -59,32 +68,11 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 			setError(null);
 
 			try {
-				// 直接獲取 TurnCap 對象
-				const turnCapObj = await suiClient.getObject({
-					id: turnCapId,
-					options: { showBcs: true },
-				});
-
+				const turnCapObj = await game.getOwnedTurnCap(suiClient, address);
 				console.log("turnCapObj", turnCapObj);
 
-				if (!turnCapObj.data) {
-					throw new Error("TurnCap not found");
-				}
-
-				// 類型斷言來解決 TypeScript 錯誤
-				const bcsData = turnCapObj.data.bcs as any;
-				if (!bcsData || !bcsData.bcsBytes) {
-					throw new Error("TurnCap BCS data not available");
-				}
-
-				const turnCapData = TurnCap.fromBcs(
-					fromBase64(bcsData.bcsBytes)
-				);
-
-				console.log("turnCapData", turnCapData);
-
-				setTurnCap(turnCapData);
-				return turnCapData;
+				setTurnCap(turnCapObj[0]);
+				return turnCapObj[0];
 			} catch (err: any) {
 				console.error("Error fetching TurnCap by ID:", err);
 				setError(err.message || "Error fetching TurnCap");
@@ -93,7 +81,7 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 				setIsLoading(false);
 			}
 		},
-		[suiClient]
+		[suiClient, game, address]
 	);
 
 	// 通過ID獲取遊戲
@@ -127,11 +115,7 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 
 				const gameData = Game.fromBcs(fromBase64(bcsData.bcsBytes));
 
-				console.log("gameData", gameData);
-
 				const newGame = new MonopolyGame(gameData);
-
-				console.log("newGame", newGame);
 
 				setGame(newGame);
 				return newGame;
@@ -146,17 +130,16 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 		[suiClient]
 	);
 
-	// useEffect(() => {
-	// 	// 固定的遊戲ID
-	// 	const gameId =
-	// 		"0x3cf4a59c212e2e22b4fab7f2d144835660b6700768a5295a8618ea0b2d99a4a2";
-	// 	fetchGameById(gameId);
+	useEffect(() => {
+		if (!roomData?.roomInfo?.gameId || !address) return;
+		const gameId = roomData.roomInfo.gameId;
+		fetchGameById(gameId);
+	}, [roomData, address, fetchGameById]);
 
-	// 	// 固定的 TurnCap ID
-	// 	const turnCapId =
-	// 		"0xad49c2ba35a6547fcc7501bbb1ed1bb83dd16cf93461b0297fc6244a1414742b";
-	// 	fetchTurnCapById(turnCapId);
-	// }, [fetchGameById, fetchTurnCapById]);
+	useEffect(() => {
+		if (!game || !address) return;
+		fetchTurnCap();
+	}, [game, address, fetchTurnCap]);
 
 	return (
 		<GameActionContext.Provider
@@ -166,7 +149,7 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 				isLoading,
 				error,
 				fetchGameById,
-				fetchTurnCapById,
+				fetchTurnCap,
 				setError,
 				setIsLoading,
 			}}

@@ -7,7 +7,6 @@ import { PLAYER_ONE_DEFAULT_STATE } from "@/constants/states";
 import StatusDialog from "@/components/game/StatusDialog";
 import { useGame } from "@/contexts/GameContext";
 
-
 import { useState, useEffect } from "react";
 import { initializeDefaultPlayers } from "@/utils/gameAdapter";
 import { PlayerState } from "@/types/game";
@@ -27,26 +26,64 @@ const messages = [
 ];
 
 export default function GamePage() {
-	const { isTurn, roomData } = useGame();
+	const { isTurn, roomData, turnAddress } = useGame();
 	const { socket } = useSocket();
-
+	const [currentPlayerIndex, setCurrentPlayerIndex] = useState<number | null>(
+		null
+	);
 	const [players, setPlayers] = useState<PlayerState[]>([]);
+	const [error, setError] = useState<string | null>(null);
+
+	console.log("turnAddress", turnAddress);
+	console.log("players", players);
+	console.log("currentPlayerIndex", currentPlayerIndex);
 
 	useEffect(() => {
-		if (!roomData) return;
-		const players = initializeDefaultPlayers(roomData);
-		setPlayers(players);
-	}, [roomData]);
+		try {
+			if (!roomData) return;
+			const players = initializeDefaultPlayers(roomData);
+			setPlayers(players);
+			setCurrentPlayerIndex(
+				players.findIndex((player) => player.address === turnAddress) +
+					1
+			);
+		} catch (err) {
+			console.error("Error initializing players:", err);
+			setError(
+				err instanceof Error
+					? err.message
+					: "Failed to initialize players"
+			);
+		}
+	}, [roomData, turnAddress]);
 
-	console.log(players);
+	// 显示错误状态
+	if (error) {
+		return (
+			<div className="w-full h-full flex items-center justify-center text-red-500">
+				{error}
+			</div>
+		);
+	}
+
+	// 显示加载状态
+	if (!roomData || !players.length || currentPlayerIndex === null) {
+		return (
+			<div className="w-full h-full flex items-center justify-center">
+				Loading game data...
+			</div>
+		);
+	}
 
 	return (
 		<div className="w-full h-full relative">
-			<PhaserGame
-				players={players}
-				currentPlayerIndex={0}
-				socket={socket}
-			/>
+			{/* {(socket && players.length > 0 && currentPlayerIndex !== null) && (
+				<PhaserGame
+					players={players}
+					currentPlayerIndex={currentPlayerIndex}
+					socket={socket}
+				/>
+			)} */}
 			<MiniMap />
 			<Gamepad
 				playerState={PLAYER_ONE_DEFAULT_STATE}
