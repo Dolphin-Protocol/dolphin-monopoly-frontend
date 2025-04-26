@@ -132,7 +132,7 @@ const Gamepad: React.FC<GamepadProps> = ({
 			</CardContent>
 
 			<CardFooter className="pt-0 flex flex-col gap-2">
-				{isTurn && (
+
 					<Button
 						onClick={handleRollClick}
 						variant="default"
@@ -144,7 +144,7 @@ const Gamepad: React.FC<GamepadProps> = ({
 						<Dice5 className="mr-2 h-5 w-5" />
 						{(isRolling || isLoading) ? "Rolling Dice..." : "Roll Dice"}
 					</Button>
-				)}
+				
 				<Button
 					onClick={handleBuyHouse}
 					variant="default"

@@ -24,10 +24,14 @@ export const useRollDice = (): UseRollDiceReturn => {
 			return null;
 		}
 
+		console.log("game", game);
+		console.log("turnCap", turnCap);
+
 		if (!turnCap) {
 			setError("No turnCap");
 			return null;
 		}
+
 
 		if (!address) {
 			setError("No wallet connected");

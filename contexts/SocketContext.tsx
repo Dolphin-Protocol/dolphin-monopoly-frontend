@@ -14,6 +14,21 @@ import { ApiRoomData } from "@/types/socket";
 
 const SOCKET_URL = "http://5.183.11.9:3003";
 
+type Price = {
+	level: number;
+	value: number;
+};
+
+type HouseCell = {
+	id: string;
+	owner: string;
+	level: number;
+	position: number;
+	buyPrice: Price;
+	sellPrice: Price;
+	rentPrice: Price;
+};
+
 interface ServerToClientEvents {
 	rooms: (data: { rooms: Room[] }) => void;
 	roomCreated: (data: Room) => void;
@@ -24,6 +39,8 @@ interface ServerToClientEvents {
 	gameState: (data: { gameState: ApiRoomData }) => void;
 	ChangeTurn: (data: { player: string }) => void;
 	Move: (data: { player: string; address: string }) => void;
+	ActionRequest: (data: { player: string; houseCell: HouseCell }) => void;
+	Buy: (data: { player: string; purchased: boolean }) => void;
 }
 
 interface ClientToServerEvents {
@@ -35,6 +52,8 @@ interface ClientToServerEvents {
 	gameState: (data: { roomId: string }) => void;
 	ChangeTurn: (data: { roomId: string }) => void;
 	Move: (data: { roomId: string }) => void;
+	ActionRequest: (data: { roomId: string }) => void;
+	Buy: (data: { roomId: string }) => void;
 }
 
 interface SocketContextType {
@@ -112,9 +131,8 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
 			return () => {
 				clearTimeout(timer);
-				if (socketInstance) {
-					socketInstance.disconnect();
-				}
+				setSocket(null);
+				setIsConnected(false);
 			};
 		} else {
 			if (socket) {

@@ -49,8 +49,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		if (!roomId) return;
 
 		socket.emit("gameState", { roomId });
-		socket.emit("ChangeTurn", { roomId });
-		// socket.emit("Move", { roomId });
 
 		socket.on("ChangeTurn", (data) => {
 			console.log("ChangeTurn", data);
@@ -58,12 +56,19 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 			setIsTurn(data.player === address);
 		});
 		socket.on("gameState", (data) => {
+			console.log("gameState", data);
 			if (!data) return;
 			setRoomData(data.gameState);
 		});
-		// socket.on("Move", (data) => {
-		// 	console.log("Move", data);
-		// });
+		socket.on("Move", (data) => {
+			console.log("Move", data);
+		});
+		socket.on("ActionRequest", (data) => {
+			console.log("ActionRequest", data);
+		});
+		socket.on("Buy", (data) => {
+			console.log("Buy", data);
+		});
 
 		socket.on("error", (data) => {
 			console.error("Socket error:", data.message);
@@ -73,7 +78,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 			socket.off("ChangeTurn");
 			socket.off("error");
 			socket.off("gameState");
-			// socket.off("Move");
+			socket.off("Move");
+			socket.off("ActionRequest");
+			socket.off("Buy");
 		};
 	}, [address, socket, roomId]);
 
