@@ -64,12 +64,19 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 				return null;
 			}
 
+			console.log("address", address);
+
 			setIsLoading(true);
 			setError(null);
 
 			try {
 				const turnCapObj = await game.getOwnedTurnCap(suiClient, address);
 				console.log("turnCapObj", turnCapObj);
+
+				if (!turnCapObj[0]) {
+					setTurnCap(null);
+					return null;
+				}
 
 				setTurnCap(turnCapObj[0]);
 				return turnCapObj[0];

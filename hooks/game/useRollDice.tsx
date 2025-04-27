@@ -32,7 +32,6 @@ export const useRollDice = (): UseRollDiceReturn => {
 			return null;
 		}
 
-
 		if (!address) {
 			setError("No wallet connected");
 			return null;
@@ -69,7 +68,7 @@ export const useRollDice = (): UseRollDiceReturn => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [game, address, executeTransactionWithoutSponsorship]);
+	}, [game, address, executeTransactionWithoutSponsorship, turnCap]);
 
 	return {
 		isLoading,
