@@ -440,70 +440,64 @@ class MonopolyScene extends Phaser.Scene {
 
 	setupControls() {
 		// 點擊測試移動
-		this.input.on("pointerdown", () => {
-			const playerObj = this.players[this.currentPlayerIndex];
-			const path = this.getPathByPlayer(this.currentPlayerIndex);
-			const steps = Phaser.Math.Between(1, 6);
-
-			this.movePlayerAlongPath(playerObj, steps, path, () => {
-				console.log("移動完畢");
-			});
-		});
-
-		// 按 Enter 建造房子
-		this.input.keyboard?.on("keydown-ENTER", () => {
-			const player = this.players[this.currentPlayerIndex];
-			const pos = HOUSE_POSITIONS[player.state.positionIndex];
-			if (!pos) return;
-
-			const housePosition = this.add.sprite(
-				pos.x * tileSize,
-				pos.y * tileSize,
-				"House_Level_1",
-				this.currentPlayerIndex
-			);
-			housePosition.setOrigin(0.5, 0.5);
-
-			this.tweens.add({
-				targets: housePosition,
-				scale: { from: 0, to: 1 },
-				duration: 800,
-				ease: "Back.Out",
-				onComplete: () => {
-					this.time.delayedCall(400, () => {
-						this.currentPlayerIndex =
-							(this.currentPlayerIndex + 1) % this.players.length;
-						const nextPlayer =
-							this.players[this.currentPlayerIndex];
-
-						this.cameras.main.pan(
-							nextPlayer.sprite.x,
-							nextPlayer.sprite.y,
-							500,
-							"Sine.easeInOut",
-							true,
-							(
-								camera: Phaser.Cameras.Scene2D.Camera,
-								progress: number
-							) => {
-								if (progress === 1) {
-									this.cameras.main.startFollow(
-										nextPlayer.sprite
-									);
-								}
-							}
-						);
-					});
-				},
-			});
-		});
+		// this.input.on("pointerdown", () => {
+		// 	const playerObj = this.players[this.currentPlayerIndex];
+		// 	const path = this.getPathByPlayer(this.currentPlayerIndex);
+		// 	const steps = Phaser.Math.Between(1, 6);
+		// 	this.movePlayerAlongPath(playerObj, steps, path, () => {
+		// 		console.log("移動完畢");
+		// 	});
+		// });
+		// // 按 Enter 建造房子
+		// this.input.keyboard?.on("keydown-ENTER", () => {
+		// 	const player = this.players[this.currentPlayerIndex];
+		// 	const pos = HOUSE_POSITIONS[player.state.positionIndex];
+		// 	if (!pos) return;
+		// 	const housePosition = this.add.sprite(
+		// 		pos.x * tileSize,
+		// 		pos.y * tileSize,
+		// 		"House_Level_1",
+		// 		this.currentPlayerIndex
+		// 	);
+		// 	housePosition.setOrigin(0.5, 0.5);
+		// 	this.tweens.add({
+		// 		targets: housePosition,
+		// 		scale: { from: 0, to: 1 },
+		// 		duration: 800,
+		// 		ease: "Back.Out",
+		// 		onComplete: () => {
+		// 			this.time.delayedCall(400, () => {
+		// 				this.currentPlayerIndex =
+		// 					(this.currentPlayerIndex + 1) % this.players.length;
+		// 				const nextPlayer =
+		// 					this.players[this.currentPlayerIndex];
+		// 				this.cameras.main.pan(
+		// 					nextPlayer.sprite.x,
+		// 					nextPlayer.sprite.y,
+		// 					500,
+		// 					"Sine.easeInOut",
+		// 					true,
+		// 					(
+		// 						camera: Phaser.Cameras.Scene2D.Camera,
+		// 						progress: number
+		// 					) => {
+		// 						if (progress === 1) {
+		// 							this.cameras.main.startFollow(
+		// 								nextPlayer.sprite
+		// 							);
+		// 						}
+		// 					}
+		// 				);
+		// 			});
+		// 		},
+		// 	});
+		// });
 	}
 
 	setupSocketListeners() {
-		// 設置 socket 事件監聽
-		this.socket.on("WsRollDiceEvent", ({ player, dice }) => {
-			console.log("收到骰子事件:", player, dice);
-			// 假設你這邊是根據 player index 找對應的 index
+		this.socket.on("Move", ({ player, position }) => {
+			console.log("收到骰子事件:", player, position);
+
 			const playerIndex = this.players.findIndex(
 				(p) => p.state.playerIndex === player
 			);
@@ -512,13 +506,8 @@ class MonopolyScene extends Phaser.Scene {
 			const playerObj = this.players[playerIndex];
 			const path = this.getPathByPlayer(playerIndex);
 
-			this.movePlayerAlongPath(playerObj, dice, path, () => {
+			this.movePlayerAlongPath(playerObj, position, path, () => {
 				console.log("移動完畢");
-				// 可以在這裡發送移動完成事件
-				this.socket.emit("playerMoveComplete", {
-					player,
-					newPosition: playerObj.state.positionIndex,
-				});
 			});
 		});
 	}
@@ -534,10 +523,15 @@ class MonopolyScene extends Phaser.Scene {
 
 	movePlayerAlongPath(
 		playerObj: Player,
-		steps: number,
+		targetPosition: number, // 目標位置
 		path: Position[],
 		onComplete: () => void
 	) {
+		// 計算需要移動的步數
+		const currentIndex = playerObj.state.positionIndex;
+		const targetIndex = targetPosition;
+		const steps = targetIndex - currentIndex;
+
 		const moveStep = (step: number) => {
 			const nextIndex = playerObj.state.positionIndex + 1;
 			if (nextIndex >= path.length) {

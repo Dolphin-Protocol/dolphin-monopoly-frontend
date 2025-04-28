@@ -7,6 +7,7 @@ export interface ApiRoomInfo {
 
 // 玩家状态类型
 export interface ApiPlayerState {
+  address: string;
   balance: number;
   position: number;
 }
@@ -40,6 +41,6 @@ export type ApiHouseCell = ApiPropertyCell | ApiNonPropertyCell;
 // 完整的房间数据类型
 export interface ApiRoomData {
   roomInfo: ApiRoomInfo;
-  playersState: Record<string, ApiPlayerState>;
+  playersState: ApiPlayerState[];
   houseCell: ApiHouseCell[];
 }

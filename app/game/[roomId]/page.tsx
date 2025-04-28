@@ -43,10 +43,14 @@ export default function GamePage() {
 			if (!roomData) return;
 			const players = initializeDefaultPlayers(roomData);
 			setPlayers(players);
-			setCurrentPlayerIndex(
-				players.findIndex((player) => player.address === turnAddress) +
-					1
-			);
+			const currentPlayerIndex = players.find(
+				(player) => player.address === turnAddress
+			)?.playerIndex;
+			if (currentPlayerIndex) {
+				setCurrentPlayerIndex(currentPlayerIndex);
+			} else {
+				setCurrentPlayerIndex(null);
+			}
 		} catch (err) {
 			console.error("Error initializing players:", err);
 			setError(
@@ -55,7 +59,7 @@ export default function GamePage() {
 					: "Failed to initialize players"
 			);
 		}
-	}, [roomData, turnAddress]);
+	}, [roomData, turnAddress, initializeDefaultPlayers]);
 
 	// 显示错误状态
 	if (error) {

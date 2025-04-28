@@ -22,7 +22,7 @@ export function createPlayerStatesFromRoomData(
 ): PlayerState[] {
 	const { playersState, houseCell } = roomData;
 
-	// 玩家路径映射表
+	// 玩家路徑映射表
 	const playerPaths = [
 		PLAYER_ONE_PATH,
 		PLAYER_TWO_PATH,
@@ -30,55 +30,50 @@ export function createPlayerStatesFromRoomData(
 		PLAYER_FOUR_PATH,
 	];
 
-	// 获取所有可购买的房产单元
+	// 獲取所有可購買的房產單元
 	const propertyCells = houseCell.filter(
 		(cell): cell is ApiPropertyCell => "owner" in cell && "buyPrice" in cell
 	);
 
-	// 创建房屋位置查找映射
+	// 創建房屋位置查找映射
 	const positionToHouse = new Map<number, ApiPropertyCell>();
 	propertyCells.forEach((cell) => {
 		positionToHouse.set(cell.position, cell);
 	});
 
-	// 将后端玩家数据转换为游戏所需的玩家状态
-	const players = Object.entries(playersState).map(
-		([playerId, state], index) => {
-			// 选择对应的路径数组
-			const path = playerPaths[index] || playerPaths[0];
+	// 將後端玩家數據轉換為遊戲所需的玩家狀態
+	const players = playersState.map((state, index) => {
+		// 選擇對應的路徑數組
+		const path = playerPaths[index] || playerPaths[0];
 
-			// 确保位置索引在有效范围内
+			// 確保位置索引在有效範圍內
 			const positionIndex = Math.min(state.position, path.length - 1);
 
-			// 获取玩家当前的位置信息
+			// 獲取玩家當前的位置信息
 			const position = path[positionIndex];
 
-			// 获取玩家拥有的房产
+			// 獲取玩家擁有的房產
 			const ownedHouses: House[] = propertyCells
-				.filter((cell) => cell.owner === playerId)
+				.filter((cell) => cell.owner === state.address)
 				.map((cell) => {
-					// 使用 HOUSE_POSITIONS 获取房屋在棋盘上的位置
 					const housePosition = HOUSE_POSITIONS[cell.position];
-
-					// 如果位置无效（如 null），则跳过该房屋
 					if (!housePosition) {
-						console.warn(`房屋位置无效：${cell.position}`);
+						console.warn(`房屋位置無效：${cell.position}`);
 						return null;
 					}
-
 					return {
 						x: housePosition.x,
 						y: housePosition.y,
 						level: cell.level,
 					};
 				})
-				.filter((house): house is House => house !== null); // 过滤掉 null 值
+				.filter((house): house is House => house !== null);
 
-			// 创建玩家状态
+			// 創建玩家狀態
 			return {
-				playerIndex: index + 1, // 玩家索引从1开始
+				playerIndex: index + 1,
 				positionIndex,
-				address: playerId,
+				address: state.address,
 				direction: position.direction,
 				assets: state.balance,
 				position,
