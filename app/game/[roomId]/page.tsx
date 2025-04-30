@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import { initializeDefaultPlayers } from "@/utils/gameAdapter";
 import { PlayerState } from "@/types/game";
 import { useSocket } from "@/contexts/SocketContext";
-
+import { useParams } from "next/navigation";
 const messages = [
 	"Player moved to Go, collect 200 coins",
 	"Chance card drawn: Advance to nearest railroad",
@@ -33,61 +33,55 @@ export default function GamePage() {
 	);
 	const [players, setPlayers] = useState<PlayerState[]>([]);
 	const [error, setError] = useState<string | null>(null);
+	const { roomId } = useParams<{ roomId: string }>();
 
-	console.log("turnAddress", turnAddress);
-	console.log("players", players);
-	console.log("currentPlayerIndex", currentPlayerIndex);
+	// console.log("turnAddress", turnAddress);
+	// console.log("players", players);
+	// console.log("currentPlayerIndex", currentPlayerIndex);
 
-	useEffect(() => {
-		try {
-			if (!roomData) return;
-			const players = initializeDefaultPlayers(roomData);
-			setPlayers(players);
-			const currentPlayerIndex = players.find(
-				(player) => player.address === turnAddress
-			)?.playerIndex;
-			if (currentPlayerIndex) {
-				setCurrentPlayerIndex(currentPlayerIndex);
-			} else {
-				setCurrentPlayerIndex(null);
-			}
-		} catch (err) {
-			console.error("Error initializing players:", err);
-			setError(
-				err instanceof Error
-					? err.message
-					: "Failed to initialize players"
-			);
-		}
-	}, [roomData, turnAddress, initializeDefaultPlayers]);
+	// useEffect(() => {
+	// 	console.log("run");
+	// 	try {
+	// 		if (!roomData) return;
+	// 		const players = initializeDefaultPlayers(roomData);
+	// 		setPlayers(players);
+	// 		const currentPlayerIndex = players.find(
+	// 			(player) => player.address === turnAddress
+	// 		)?.playerIndex;
+	// 		if (currentPlayerIndex) {
+	// 			setCurrentPlayerIndex(currentPlayerIndex);
+	// 		} else {
+	// 			setCurrentPlayerIndex(null);
+	// 		}
+	// 	} catch (err) {
+	// 		console.error("Error initializing players:", err);
+	// 		setError(
+	// 			err instanceof Error
+	// 				? err.message
+	// 				: "Failed to initialize players"
+	// 		);
+	// 	}
+	// }, [roomData, turnAddress, initializeDefaultPlayers]);
 
-	// 显示错误状态
-	if (error) {
-		return (
-			<div className="w-full h-full flex items-center justify-center text-red-500">
-				{error}
-			</div>
-		);
-	}
+	// if (error) {
+	// 	return (
+	// 		<div className="w-full h-full flex items-center justify-center text-red-500">
+	// 			{error}
+	// 		</div>
+	// 	);
+	// }
 
-	// 显示加载状态
-	if (!roomData || !players.length || currentPlayerIndex === null) {
-		return (
-			<div className="w-full h-full flex items-center justify-center">
-				Loading game data...
-			</div>
-		);
-	}
+	// if (!roomData || !players.length || currentPlayerIndex === null) {
+	// 	return (
+	// 		<div className="w-full h-full flex items-center justify-center">
+	// 			Loading game data...
+	// 		</div>
+	// 	);
+	// }
 
 	return (
 		<div className="w-full h-full relative">
-			{/* {(socket && players.length > 0 && currentPlayerIndex !== null) && (
-				<PhaserGame
-					players={players}
-					currentPlayerIndex={currentPlayerIndex}
-					socket={socket}
-				/>
-			)} */}
+			<PhaserGame socket={socket} roomId={roomId} />
 			<MiniMap />
 			<Gamepad
 				playerState={PLAYER_ONE_DEFAULT_STATE}

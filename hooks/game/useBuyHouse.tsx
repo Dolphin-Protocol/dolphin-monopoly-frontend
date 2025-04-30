@@ -43,10 +43,8 @@ export const useBuyHouse = (): UseBuyHouseReturn => {
 					address,
 					Action.BUY_OR_UPGRADE
 				);
-
 				console.log("requests", requests);
 
-				// 為什麼是 array 哪一個是哪一個
 				if (requests.length === 0) {
 					setError("No buy request available");
 					return null;
@@ -71,6 +69,7 @@ export const useBuyHouse = (): UseBuyHouseReturn => {
 				}
 				const buyEvents =
 					game.parsePlayerBuyOrUpgradeEvent(result);
+				console.log("buyEvents", buyEvents);
 
 				return buyEvents;
 			} catch (err: any) {

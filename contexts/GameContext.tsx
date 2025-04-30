@@ -49,18 +49,18 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     if (!roomId) return;
 
     socket.emit("gameState", { roomId });
+	socket.emit("ChangeTurn", { roomId });
+
+	socket.on("gameState", (data) => {
+	  console.log("gameState", data);
+	  if (!data) return;
+	  setRoomData(data.gameState);
+	});
 
     socket.on("ChangeTurn", (data) => {
       console.log("ChangeTurn", data);
-      socket.emit("gameState", { roomId });
       setTurnAddress(data.player);
       setIsTurn(data.player === address);
-    });
-
-    socket.on("gameState", (data) => {
-      console.log("gameState", data);
-      if (!data) return;
-      setRoomData(data.gameState);
     });
     socket.on("Move", (data) => {
       console.log("Move", data);

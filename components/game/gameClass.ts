@@ -14,9 +14,8 @@ import {
 	PLAYER_THREE_PATH,
 	PLAYER_FOUR_PATH,
 } from "@/constants/paths";
-import { HOUSE_POSITIONS } from "@/constants/houses";
 import { Socket } from "socket.io-client";
-
+import { initializeDefaultPlayers } from "@/utils/gameAdapter";
 export type Player = {
 	sprite: Phaser.GameObjects.Sprite;
 	state: PlayerState;
@@ -31,19 +30,20 @@ class MonopolyScene extends Phaser.Scene {
 	socket: Socket;
 	playerStates: PlayerState[];
 	players: Player[];
-	currentPlayerIndex: number;
+	currentPlayerIndex: number = 1;
 	houseSprites: Phaser.GameObjects.Sprite[] = [];
-
+	roomId: string;
 	constructor(
 		socket: Socket,
-		playerStates: PlayerState[],
-		currentPlayerIndex: number
+		roomId: string
 	) {
 		super("MonopolyScene");
 		this.socket = socket;
-		this.playerStates = playerStates;
+		this.playerStates = [];
 		this.players = [];
-		this.currentPlayerIndex = currentPlayerIndex;
+		this.currentPlayerIndex = 1;
+		this.houseSprites = [];
+		this.roomId = roomId;
 	}
 
 	preload() {
@@ -112,7 +112,6 @@ class MonopolyScene extends Phaser.Scene {
 	}
 
 	create() {
-		console.log("create 開始執行");
 		try {
 			const map = this.make.tilemap({ key: "map" });
 			const waterTileset = map.addTilesetImage("Water", "Water")!;
@@ -219,11 +218,26 @@ class MonopolyScene extends Phaser.Scene {
 					ChickenHousesTileset
 				);
 
-				this.createAnimations();
-				this.initializePlayers(map);
-				this.initializeHouses();
-				this.setupControls();
-				this.setupSocketListeners();
+				this.socket.emit("gameState", { roomId: this.roomId });
+				this.socket.emit("ChangeTurn", { roomId: this.roomId });
+
+				this.socket.on("gameState", (data) => {
+					console.log("gameState", data);
+					if (!data || !data.gameState) {
+						console.error("收到的游戏状态数据无效", data);
+						return; // 或使用默认状态继续
+					}
+					const defaultPlayers = initializeDefaultPlayers(data.gameState);
+					console.log("defaultPlayers", defaultPlayers);
+					this.playerStates = defaultPlayers;
+
+					this.createAnimations();
+					this.initializePlayers(map);
+					this.initializeHouses();
+					this.setupSocketListeners();				
+				});
+				
+				
 			}
 		} catch (error) {
 			console.error("Create 錯誤:", error);
@@ -438,68 +452,68 @@ class MonopolyScene extends Phaser.Scene {
 		});
 	}
 
-	setupControls() {
-		// 點擊測試移動
-		// this.input.on("pointerdown", () => {
-		// 	const playerObj = this.players[this.currentPlayerIndex];
-		// 	const path = this.getPathByPlayer(this.currentPlayerIndex);
-		// 	const steps = Phaser.Math.Between(1, 6);
-		// 	this.movePlayerAlongPath(playerObj, steps, path, () => {
-		// 		console.log("移動完畢");
-		// 	});
-		// });
-		// // 按 Enter 建造房子
-		// this.input.keyboard?.on("keydown-ENTER", () => {
-		// 	const player = this.players[this.currentPlayerIndex];
-		// 	const pos = HOUSE_POSITIONS[player.state.positionIndex];
-		// 	if (!pos) return;
-		// 	const housePosition = this.add.sprite(
-		// 		pos.x * tileSize,
-		// 		pos.y * tileSize,
-		// 		"House_Level_1",
-		// 		this.currentPlayerIndex
-		// 	);
-		// 	housePosition.setOrigin(0.5, 0.5);
-		// 	this.tweens.add({
-		// 		targets: housePosition,
-		// 		scale: { from: 0, to: 1 },
-		// 		duration: 800,
-		// 		ease: "Back.Out",
-		// 		onComplete: () => {
-		// 			this.time.delayedCall(400, () => {
-		// 				this.currentPlayerIndex =
-		// 					(this.currentPlayerIndex + 1) % this.players.length;
-		// 				const nextPlayer =
-		// 					this.players[this.currentPlayerIndex];
-		// 				this.cameras.main.pan(
-		// 					nextPlayer.sprite.x,
-		// 					nextPlayer.sprite.y,
-		// 					500,
-		// 					"Sine.easeInOut",
-		// 					true,
-		// 					(
-		// 						camera: Phaser.Cameras.Scene2D.Camera,
-		// 						progress: number
-		// 					) => {
-		// 						if (progress === 1) {
-		// 							this.cameras.main.startFollow(
-		// 								nextPlayer.sprite
-		// 							);
-		// 						}
-		// 					}
-		// 				);
-		// 			});
-		// 		},
-		// 	});
-		// });
-	}
+	// setupControls() {
+	// 	// 點擊測試移動
+	// 	// this.input.on("pointerdown", () => {
+	// 	// 	const playerObj = this.players[this.currentPlayerIndex];
+	// 	// 	const path = this.getPathByPlayer(this.currentPlayerIndex);
+	// 	// 	const steps = Phaser.Math.Between(1, 6);
+	// 	// 	this.movePlayerAlongPath(playerObj, steps, path, () => {
+	// 	// 		console.log("移動完畢");
+	// 	// 	});
+	// 	// });
+	// 	// // 按 Enter 建造房子
+	// 	// this.input.keyboard?.on("keydown-ENTER", () => {
+	// 	// 	const player = this.players[this.currentPlayerIndex];
+	// 	// 	const pos = HOUSE_POSITIONS[player.state.positionIndex];
+	// 	// 	if (!pos) return;
+	// 	// 	const housePosition = this.add.sprite(
+	// 	// 		pos.x * tileSize,
+	// 	// 		pos.y * tileSize,
+	// 	// 		"House_Level_1",
+	// 	// 		this.currentPlayerIndex
+	// 	// 	);
+	// 	// 	housePosition.setOrigin(0.5, 0.5);
+	// 	// 	this.tweens.add({
+	// 	// 		targets: housePosition,
+	// 	// 		scale: { from: 0, to: 1 },
+	// 	// 		duration: 800,
+	// 	// 		ease: "Back.Out",
+	// 	// 		onComplete: () => {
+	// 	// 			this.time.delayedCall(400, () => {
+	// 	// 				this.currentPlayerIndex =
+	// 	// 					(this.currentPlayerIndex + 1) % this.players.length;
+	// 	// 				const nextPlayer =
+	// 	// 					this.players[this.currentPlayerIndex];
+	// 	// 				this.cameras.main.pan(
+	// 	// 					nextPlayer.sprite.x,
+	// 	// 					nextPlayer.sprite.y,
+	// 	// 					500,
+	// 	// 					"Sine.easeInOut",
+	// 	// 					true,
+	// 	// 					(
+	// 	// 						camera: Phaser.Cameras.Scene2D.Camera,
+	// 	// 						progress: number
+	// 	// 					) => {
+	// 	// 						if (progress === 1) {
+	// 	// 							this.cameras.main.startFollow(
+	// 	// 								nextPlayer.sprite
+	// 	// 							);
+	// 	// 						}
+	// 	// 					}
+	// 	// 				);
+	// 	// 			});
+	// 	// 		},
+	// 	// 	});
+	// 	// });
+	// }
 
 	setupSocketListeners() {
 		this.socket.on("Move", ({ player, position }) => {
 			console.log("收到骰子事件:", player, position);
 
 			const playerIndex = this.players.findIndex(
-				(p) => p.state.playerIndex === player
+				(p) => p.state.address === player
 			);
 			if (playerIndex === -1) return;
 
@@ -509,6 +523,32 @@ class MonopolyScene extends Phaser.Scene {
 			this.movePlayerAlongPath(playerObj, position, path, () => {
 				console.log("移動完畢");
 			});
+		});
+
+		this.socket.on("ChangeTurn", ({ data }) => {
+			const { player } = data;
+
+			const playerIndex = this.players.findIndex(
+				(p) => p.state.address === player
+			);
+			if (playerIndex === -1) return;
+
+			this.currentPlayerIndex = playerIndex;
+			const nextPlayer = this.players[playerIndex];
+
+			// 平滑過渡到新的玩家
+			this.cameras.main.pan(
+				nextPlayer.sprite.x,
+				nextPlayer.sprite.y,
+				500,
+				"Sine.easeInOut",
+				true,
+				(camera: Phaser.Cameras.Scene2D.Camera, progress: number) => {
+					if (progress === 1) {
+						this.cameras.main.startFollow(nextPlayer.sprite);
+					}
+				}
+			);
 		});
 	}
 
