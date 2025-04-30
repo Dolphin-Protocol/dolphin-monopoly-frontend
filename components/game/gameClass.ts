@@ -218,6 +218,10 @@ class MonopolyScene extends Phaser.Scene {
 					ChickenHousesTileset
 				);
 
+				const camera = this.cameras.main;
+				camera.setZoom(4);
+				camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
 				this.socket.emit("gameState", { roomId: this.roomId });
 				this.socket.emit("ChangeTurn", { roomId: this.roomId });
 
