@@ -111,18 +111,14 @@ export function updatePlayerStates(
 	});
 }
 
-/**
- * 初始化默认玩家状态
- */
+
 export function initializeDefaultPlayers(
 	roomData: ApiRoomData | null
 ): PlayerState[] {
-	// 如果有房间数据，使用它创建玩家状态
 	if (roomData) {
 		return createPlayerStatesFromRoomData(roomData);
 	}
 
-	// 否则返回默认状态
 	return [
 		PLAYER_ONE_DEFAULT_STATE,
 		PLAYER_TWO_DEFAULT_STATE,

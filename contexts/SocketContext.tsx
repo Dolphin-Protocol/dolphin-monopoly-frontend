@@ -41,7 +41,14 @@ interface ServerToClientEvents {
 	ChangeTurn: (data: { player: string }) => void;
 	Move: (data: { player: string; position: number }) => void;
 	ActionRequest: (data: { player: string; houseCell: HouseCell }) => void;
-	Buy: (data: { player: string; purchased: boolean }) => void;
+	Buy: (data: { player: string; purchased: boolean, houseCell: HouseCell }) => void;
+	PayHouseToll: (data: {
+		player: string;
+		houseCell: HouseCell;
+		paidAmount: number;
+		payee: string;
+		level: number;
+	}) => void;
 }
 
 interface ClientToServerEvents {
@@ -65,6 +72,8 @@ interface SocketContextType {
 	connectionError: string;
 	reconnect: () => void;
 }
+
+export type GameSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
 

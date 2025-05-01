@@ -48,7 +48,7 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const { address } = useCustomWallet();
-	const { roomData } = useGame();
+	const { roomData, isTurn } = useGame();
 	const suiClient = useSuiClient();
 
 	// 通過ID獲取 TurnCap
@@ -146,7 +146,7 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {
 		if (!game || !address) return;
 		fetchTurnCap();
-	}, [game, address, fetchTurnCap]);
+	}, [game, address, fetchTurnCap, isTurn]);
 
 	return (
 		<GameActionContext.Provider

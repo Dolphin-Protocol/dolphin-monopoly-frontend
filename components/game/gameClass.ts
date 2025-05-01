@@ -16,6 +16,8 @@ import {
 } from "@/constants/paths";
 import { Socket } from "socket.io-client";
 import { initializeDefaultPlayers } from "@/utils/gameAdapter";
+import { GameSocket } from "@/contexts/SocketContext";
+import { HOUSE_POSITIONS } from "@/constants/houses";
 export type Player = {
 	sprite: Phaser.GameObjects.Sprite;
 	state: PlayerState;
@@ -27,16 +29,17 @@ const tileSize = 16;
 
 // 這邊需要改型別，並且不用 index 去判斷玩家，而是使用地址
 class MonopolyScene extends Phaser.Scene {
-	socket: Socket;
+	socket: GameSocket;
 	playerStates: PlayerState[];
 	players: Player[];
 	currentPlayerIndex: number = 1;
 	houseSprites: Phaser.GameObjects.Sprite[] = [];
 	roomId: string;
-	constructor(
-		socket: Socket,
-		roomId: string
-	) {
+	currentPlayerAddress: string;
+	isMoving: boolean = false;
+	isBuying: boolean = false;
+
+	constructor(socket: Socket, roomId: string) {
 		super("MonopolyScene");
 		this.socket = socket;
 		this.playerStates = [];
@@ -44,6 +47,9 @@ class MonopolyScene extends Phaser.Scene {
 		this.currentPlayerIndex = 1;
 		this.houseSprites = [];
 		this.roomId = roomId;
+		this.currentPlayerAddress = "";
+		this.isMoving = false;
+		this.isBuying = false;
 	}
 
 	preload() {
@@ -222,26 +228,27 @@ class MonopolyScene extends Phaser.Scene {
 				camera.setZoom(4);
 				camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
-				this.socket.emit("gameState", { roomId: this.roomId });
-				this.socket.emit("ChangeTurn", { roomId: this.roomId });
+				// this.socket.emit("gameState", { roomId: this.roomId });
+				// this.socket.emit("ChangeTurn", { roomId: this.roomId });
 
 				this.socket.on("gameState", (data) => {
 					console.log("gameState", data);
 					if (!data || !data.gameState) {
-						console.error("收到的游戏状态数据无效", data);
-						return; // 或使用默认状态继续
+						console.log("收到的游戏状态数据无效", data);
+						return;
 					}
-					const defaultPlayers = initializeDefaultPlayers(data.gameState);
+					const defaultPlayers = initializeDefaultPlayers(
+						data.gameState
+					);
 					console.log("defaultPlayers", defaultPlayers);
 					this.playerStates = defaultPlayers;
 
 					this.createAnimations();
 					this.initializePlayers(map);
 					this.initializeHouses();
-					this.setupSocketListeners();				
 				});
-				
-				
+
+				this.setupSocketListeners();
 			}
 		} catch (error) {
 			console.error("Create 錯誤:", error);
@@ -339,12 +346,6 @@ class MonopolyScene extends Phaser.Scene {
 	}
 
 	initializePlayers(map: Phaser.Tilemaps.Tilemap) {
-		const camera = this.cameras.main;
-		camera.setZoom(4);
-
-		// 设置摄像机边界为地图的实际尺寸
-		camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-
 		// 根据方向获取对应的帧索引
 		const getFrameByDirection = (direction: string): number => {
 			switch (direction) {
@@ -423,7 +424,22 @@ class MonopolyScene extends Phaser.Scene {
 		};
 
 		this.players = [playerOne, playerTwo, playerThree, playerFour];
-		this.cameras.main.startFollow(playerOne.sprite);
+		const nextPlayer = this.players.find(
+			(player) => player.state.address === this.currentPlayerAddress
+		);
+		if (!nextPlayer) return;
+		this.cameras.main.pan(
+			nextPlayer.sprite.x,
+			nextPlayer.sprite.y,
+			500,
+			"Sine.easeInOut",
+			true,
+			(camera: Phaser.Cameras.Scene2D.Camera, progress: number) => {
+				if (progress === 1) {
+					this.cameras.main.startFollow(nextPlayer.sprite);
+				}
+			}
+		);
 	}
 
 	initializeHouses() {
@@ -447,8 +463,6 @@ class MonopolyScene extends Phaser.Scene {
 						playerIndex
 					);
 					houseSprite.setOrigin(0.5, 0.5);
-
-					// ... 动画和其他设置
 
 					this.houseSprites.push(houseSprite);
 				});
@@ -515,6 +529,7 @@ class MonopolyScene extends Phaser.Scene {
 	setupSocketListeners() {
 		this.socket.on("Move", ({ player, position }) => {
 			console.log("收到骰子事件:", player, position);
+			this.isMoving = true;
 
 			const playerIndex = this.players.findIndex(
 				(p) => p.state.address === player
@@ -526,12 +541,20 @@ class MonopolyScene extends Phaser.Scene {
 
 			this.movePlayerAlongPath(playerObj, position, path, () => {
 				console.log("移動完畢");
+				this.isMoving = false;
+				this.socket.emit("ChangeTurn", { roomId: this.roomId });
 			});
 		});
 
-		this.socket.on("ChangeTurn", ({ data }) => {
-			const { player } = data;
+		this.socket.on("ActionRequest", ({ player, houseCell }) => {
+			console.log("收到行動要求:", player, houseCell);
+			this.isBuying = true;
+		});
 
+		this.socket.on("ChangeTurn", ({ player }) => {
+			console.log("收到換人事件:", player);
+			if (this.isBuying || this.isMoving) return;
+			this.currentPlayerAddress = player;
 			const playerIndex = this.players.findIndex(
 				(p) => p.state.address === player
 			);
@@ -554,6 +577,35 @@ class MonopolyScene extends Phaser.Scene {
 				}
 			);
 		});
+
+		this.socket.on("Buy", ({ player, purchased, houseCell }) => {
+			const playerObj = this.players[this.currentPlayerIndex];
+			const pos = HOUSE_POSITIONS[playerObj.state.positionIndex];
+			if (!pos) return;
+			const housePosition = this.add.sprite(
+				pos.x * tileSize,
+				pos.y * tileSize,
+				`House_Level_${houseCell.level}`,
+				this.currentPlayerIndex
+			);
+			housePosition.setOrigin(0.5, 0.5);
+
+			this.tweens.add({
+				targets: housePosition,
+				scale: { from: 0, to: 1 },
+				duration: 800,
+				ease: "Back.Out",
+				onComplete: () => {
+					console.log("onComplete");
+					this.time.delayedCall(400, () => {
+						this.isBuying = false;
+						this.socket.emit("ChangeTurn", {
+							roomId: this.roomId,
+						});
+					});
+				},
+			});
+		});
 	}
 
 	getPathByPlayer(index: number): Position[] {
@@ -567,14 +619,18 @@ class MonopolyScene extends Phaser.Scene {
 
 	movePlayerAlongPath(
 		playerObj: Player,
-		targetPosition: number, // 目標位置
+		targetPosition: number,
 		path: Position[],
 		onComplete: () => void
 	) {
 		// 計算需要移動的步數
+		console.log("targetPosition", targetPosition);
 		const currentIndex = playerObj.state.positionIndex;
 		const targetIndex = targetPosition;
+		console.log("currentIndex", currentIndex);
+		console.log("targetIndex", targetIndex);
 		const steps = targetIndex - currentIndex;
+		console.log("steps", steps);
 
 		const moveStep = (step: number) => {
 			const nextIndex = playerObj.state.positionIndex + 1;
