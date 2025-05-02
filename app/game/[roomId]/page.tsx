@@ -12,6 +12,7 @@ import { initializeDefaultPlayers } from "@/utils/gameAdapter";
 import { PlayerState } from "@/types/game";
 import { useSocket } from "@/contexts/SocketContext";
 import { useParams } from "next/navigation";
+
 const messages = [
 	"Player moved to Go, collect 200 coins",
 	"Chance card drawn: Advance to nearest railroad",
@@ -39,45 +40,44 @@ export default function GamePage() {
 	// console.log("players", players);
 	// console.log("currentPlayerIndex", currentPlayerIndex);
 
-	// useEffect(() => {
-	// 	console.log("run");
-	// 	try {
-	// 		if (!roomData) return;
-	// 		const players = initializeDefaultPlayers(roomData);
-	// 		setPlayers(players);
-	// 		const currentPlayerIndex = players.find(
-	// 			(player) => player.address === turnAddress
-	// 		)?.playerIndex;
-	// 		if (currentPlayerIndex) {
-	// 			setCurrentPlayerIndex(currentPlayerIndex);
-	// 		} else {
-	// 			setCurrentPlayerIndex(null);
-	// 		}
-	// 	} catch (err) {
-	// 		console.error("Error initializing players:", err);
-	// 		setError(
-	// 			err instanceof Error
-	// 				? err.message
-	// 				: "Failed to initialize players"
-	// 		);
-	// 	}
-	// }, [roomData, turnAddress, initializeDefaultPlayers]);
+	useEffect(() => {
+		try {
+			if (!roomData) return;
+			const players = initializeDefaultPlayers(roomData);
+			setPlayers(players);
+			const currentPlayerIndex = players.find(
+				(player) => player.address === turnAddress
+			)?.playerIndex;
+			if (currentPlayerIndex) {
+				setCurrentPlayerIndex(currentPlayerIndex);
+			} else {
+				setCurrentPlayerIndex(null);
+			}
+		} catch (err) {
+			console.error("Error initializing players:", err);
+			setError(
+				err instanceof Error
+					? err.message
+					: "Failed to initialize players"
+			);
+		}
+	}, [roomData, turnAddress, initializeDefaultPlayers]);
 
-	// if (error) {
-	// 	return (
-	// 		<div className="w-full h-full flex items-center justify-center text-red-500">
-	// 			{error}
-	// 		</div>
-	// 	);
-	// }
+	if (error) {
+		return (
+			<div className="w-full h-full flex items-center justify-center text-red-500">
+				{error}
+			</div>
+		);
+	}
 
-	// if (!roomData || !players.length || currentPlayerIndex === null) {
-	// 	return (
-	// 		<div className="w-full h-full flex items-center justify-center">
-	// 			Loading game data...
-	// 		</div>
-	// 	);
-	// }
+	if (!roomData || !players.length || currentPlayerIndex === null) {
+		return (
+			<div className="w-full h-full flex items-center justify-center">
+				Loading game data...
+			</div>
+		);
+	}
 
 	return (
 		<div className="w-full h-full relative">

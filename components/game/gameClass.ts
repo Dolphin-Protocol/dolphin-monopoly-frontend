@@ -227,9 +227,10 @@ class MonopolyScene extends Phaser.Scene {
 				const camera = this.cameras.main;
 				camera.setZoom(4);
 				camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+				this.initializeHouses();
+				this.createAnimations();
 
-				// this.socket.emit("gameState", { roomId: this.roomId });
-				// this.socket.emit("ChangeTurn", { roomId: this.roomId });
+				this.socket.emit("gameState", { roomId: this.roomId });
 
 				this.socket.on("gameState", (data) => {
 					console.log("gameState", data);
@@ -243,11 +244,10 @@ class MonopolyScene extends Phaser.Scene {
 					console.log("defaultPlayers", defaultPlayers);
 					this.playerStates = defaultPlayers;
 
-					this.createAnimations();
 					this.initializePlayers(map);
-					this.initializeHouses();
+					this.socket.emit("ChangeTurn", { roomId: this.roomId });
 				});
-
+				
 				this.setupSocketListeners();
 			}
 		} catch (error) {
@@ -449,13 +449,11 @@ class MonopolyScene extends Phaser.Scene {
 
 		// 遍历所有玩家
 		this.players.forEach((player, playerIndex) => {
-			// 从 player.state 获取房屋信息
 			if (
 				player.state.ownedHouses &&
 				player.state.ownedHouses.length > 0
 			) {
 				player.state.ownedHouses.forEach((house) => {
-					// 创建房屋精灵
 					const houseSprite = this.add.sprite(
 						house.x * tileSize,
 						house.y * tileSize,
@@ -579,14 +577,17 @@ class MonopolyScene extends Phaser.Scene {
 		});
 
 		this.socket.on("Buy", ({ player, purchased, houseCell }) => {
-			const playerObj = this.players[this.currentPlayerIndex];
-			const pos = HOUSE_POSITIONS[playerObj.state.positionIndex];
+			const pos = HOUSE_POSITIONS[houseCell.position];
+			const playerIndex = this.players.findIndex(
+				(p) => p.state.address === player
+			);
+			if (playerIndex === -1) return;
 			if (!pos) return;
 			const housePosition = this.add.sprite(
 				pos.x * tileSize,
 				pos.y * tileSize,
 				`House_Level_${houseCell.level}`,
-				this.currentPlayerIndex
+				playerIndex
 			);
 			housePosition.setOrigin(0.5, 0.5);
 
@@ -596,7 +597,6 @@ class MonopolyScene extends Phaser.Scene {
 				duration: 800,
 				ease: "Back.Out",
 				onComplete: () => {
-					console.log("onComplete");
 					this.time.delayedCall(400, () => {
 						this.isBuying = false;
 						this.socket.emit("ChangeTurn", {
@@ -623,14 +623,10 @@ class MonopolyScene extends Phaser.Scene {
 		path: Position[],
 		onComplete: () => void
 	) {
-		// 計算需要移動的步數
-		console.log("targetPosition", targetPosition);
+		this.cameras.main.startFollow(playerObj.sprite);
 		const currentIndex = playerObj.state.positionIndex;
 		const targetIndex = targetPosition;
-		console.log("currentIndex", currentIndex);
-		console.log("targetIndex", targetIndex);
 		const steps = targetIndex - currentIndex;
-		console.log("steps", steps);
 
 		const moveStep = (step: number) => {
 			const nextIndex = playerObj.state.positionIndex + 1;
