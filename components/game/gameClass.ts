@@ -32,7 +32,6 @@ class MonopolyScene extends Phaser.Scene {
 	socket: GameSocket;
 	playerStates: PlayerState[];
 	players: Player[];
-	currentPlayerIndex: number = 1;
 	houseSprites: Phaser.GameObjects.Sprite[] = [];
 	roomId: string;
 	currentPlayerAddress: string;
@@ -44,7 +43,6 @@ class MonopolyScene extends Phaser.Scene {
 		this.socket = socket;
 		this.playerStates = [];
 		this.players = [];
-		this.currentPlayerIndex = 1;
 		this.houseSprites = [];
 		this.roomId = roomId;
 		this.currentPlayerAddress = "";
@@ -558,7 +556,6 @@ class MonopolyScene extends Phaser.Scene {
 			);
 			if (playerIndex === -1) return;
 
-			this.currentPlayerIndex = playerIndex;
 			const nextPlayer = this.players[playerIndex];
 
 			// 平滑過渡到新的玩家
