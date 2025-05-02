@@ -37,6 +37,8 @@ class MonopolyScene extends Phaser.Scene {
 	currentPlayerAddress: string;
 	isMoving: boolean = false;
 	isBuying: boolean = false;
+	hasInitializedPlayers: boolean = false;
+	hasInitializedHouses: boolean = false;
 
 	constructor(socket: Socket, roomId: string) {
 		super("MonopolyScene");
@@ -48,6 +50,8 @@ class MonopolyScene extends Phaser.Scene {
 		this.currentPlayerAddress = "";
 		this.isMoving = false;
 		this.isBuying = false;
+		this.hasInitializedPlayers = false;
+		this.hasInitializedHouses = false;
 	}
 
 	preload() {
@@ -225,15 +229,11 @@ class MonopolyScene extends Phaser.Scene {
 				const camera = this.cameras.main;
 				camera.setZoom(4);
 				camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-				this.initializeHouses();
-				this.createAnimations();
-
-				this.socket.emit("gameState", { roomId: this.roomId });
-
+				
 				this.socket.on("gameState", (data) => {
-					console.log("gameState", data);
+					console.log("收到遊戲狀態", data);
 					if (!data || !data.gameState) {
-						console.log("收到的游戏状态数据无效", data);
+						console.log("收到的遊戲狀態資料無效", data);
 						return;
 					}
 					const defaultPlayers = initializeDefaultPlayers(
@@ -241,11 +241,14 @@ class MonopolyScene extends Phaser.Scene {
 					);
 					console.log("defaultPlayers", defaultPlayers);
 					this.playerStates = defaultPlayers;
-
-					this.initializePlayers(map);
+					if (!this.hasInitializedPlayers) {
+						this.initializePlayers(map);
+					}
+					this.initializeHouses();
 					this.socket.emit("ChangeTurn", { roomId: this.roomId });
 				});
 				
+				this.createAnimations();
 				this.setupSocketListeners();
 			}
 		} catch (error) {
@@ -438,6 +441,7 @@ class MonopolyScene extends Phaser.Scene {
 				}
 			}
 		);
+		this.hasInitializedPlayers = true;
 	}
 
 	initializeHouses() {
@@ -464,63 +468,8 @@ class MonopolyScene extends Phaser.Scene {
 				});
 			}
 		});
+		this.hasInitializedHouses = true;
 	}
-
-	// setupControls() {
-	// 	// 點擊測試移動
-	// 	// this.input.on("pointerdown", () => {
-	// 	// 	const playerObj = this.players[this.currentPlayerIndex];
-	// 	// 	const path = this.getPathByPlayer(this.currentPlayerIndex);
-	// 	// 	const steps = Phaser.Math.Between(1, 6);
-	// 	// 	this.movePlayerAlongPath(playerObj, steps, path, () => {
-	// 	// 		console.log("移動完畢");
-	// 	// 	});
-	// 	// });
-	// 	// // 按 Enter 建造房子
-	// 	// this.input.keyboard?.on("keydown-ENTER", () => {
-	// 	// 	const player = this.players[this.currentPlayerIndex];
-	// 	// 	const pos = HOUSE_POSITIONS[player.state.positionIndex];
-	// 	// 	if (!pos) return;
-	// 	// 	const housePosition = this.add.sprite(
-	// 	// 		pos.x * tileSize,
-	// 	// 		pos.y * tileSize,
-	// 	// 		"House_Level_1",
-	// 	// 		this.currentPlayerIndex
-	// 	// 	);
-	// 	// 	housePosition.setOrigin(0.5, 0.5);
-	// 	// 	this.tweens.add({
-	// 	// 		targets: housePosition,
-	// 	// 		scale: { from: 0, to: 1 },
-	// 	// 		duration: 800,
-	// 	// 		ease: "Back.Out",
-	// 	// 		onComplete: () => {
-	// 	// 			this.time.delayedCall(400, () => {
-	// 	// 				this.currentPlayerIndex =
-	// 	// 					(this.currentPlayerIndex + 1) % this.players.length;
-	// 	// 				const nextPlayer =
-	// 	// 					this.players[this.currentPlayerIndex];
-	// 	// 				this.cameras.main.pan(
-	// 	// 					nextPlayer.sprite.x,
-	// 	// 					nextPlayer.sprite.y,
-	// 	// 					500,
-	// 	// 					"Sine.easeInOut",
-	// 	// 					true,
-	// 	// 					(
-	// 	// 						camera: Phaser.Cameras.Scene2D.Camera,
-	// 	// 						progress: number
-	// 	// 					) => {
-	// 	// 						if (progress === 1) {
-	// 	// 							this.cameras.main.startFollow(
-	// 	// 								nextPlayer.sprite
-	// 	// 							);
-	// 	// 						}
-	// 	// 					}
-	// 	// 				);
-	// 	// 			});
-	// 	// 		},
-	// 	// 	});
-	// 	// });
-	// }
 
 	setupSocketListeners() {
 		this.socket.on("Move", ({ player, position }) => {

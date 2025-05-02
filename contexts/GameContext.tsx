@@ -16,6 +16,7 @@ interface GameContextType {
 	turnAddress: string | null;
 	isTurn: boolean;
 	roomData: ApiRoomData | null;
+	messages: string[];
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -41,6 +42,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 	const [turnAddress, setTurnAddress] = useState<string | null>(null);
 	const [isTurn, setIsTurn] = useState<boolean>(false);
 	const [roomData, setRoomData] = useState<ApiRoomData | null>(null);
+	const [messages, setMessages] = useState<string[]>([]);
 
 	const { roomId } = useParams<{ roomId: string }>();
 
@@ -50,50 +52,49 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
 		const checkSocketAndSendRequests = () => {
 			if (socket.connected) {
-				console.log("Socket is connected, sending requests with delay");
-
-				// 先請求遊戲狀態
 				setTimeout(() => {
-					console.log("Emitting gameState event");
 					socket.emit("gameState", { roomId });
-				}, 1000);
+				}, 2000);
 
-				// 再請求換回合資訊，稍微延遲確保順序
 				setTimeout(() => {
-					console.log("Emitting ChangeTurn event");
 					socket.emit("ChangeTurn", { roomId });
-				}, 1500);
+				}, 2500);
 			} else {
-				console.log("Socket not connected yet, waiting...");
 				setTimeout(checkSocketAndSendRequests, 1000);
 			}
 		};
 
-		// 立即開始檢查
 		checkSocketAndSendRequests();
 
 		socket.on("gameState", (data) => {
-			console.log("gameState", data);
 			if (!data) return;
 			setRoomData(data.gameState);
 		});
 
 		socket.on("ChangeTurn", (data) => {
 			console.log("ChangeTurn", data);
+      if(!data.player) return;
 			setTurnAddress(data.player);
 			setIsTurn(data.player === address);
+			setMessages([...messages, `is ${data.player.slice(0, 5)}... turn`]);
 		});
 		socket.on("Move", (data) => {
 			console.log("Move", data);
+      if(!data.player) return;
+			setMessages([...messages, `${data.player.slice(0, 5)}... move to ${data.position}`]);
 		});
 		socket.on("ActionRequest", (data) => {
 			console.log("ActionRequest", data);
+      if(!data.player) return;
+			setMessages([...messages, `${data.player.slice(0, 5)}... action request`]);
 		});
 		socket.on("Buy", (data) => {
-			console.log("Buy", data);
+			if(!data.player) return;
+			setMessages([...messages, `${data.player.slice(0, 5)}... buy house`]);
 		});
 		socket.on("PayHouseToll", (data) => {
-			console.log("PayHouseToll", data);
+			if(!data.player) return;
+			setMessages([...messages, `${data.player.slice(0, 5)}... pay rent`]);
 		});
 
 		socket.on("error", (data) => {
@@ -115,6 +116,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		turnAddress,
 		isTurn,
 		roomData,
+		messages,
 	};
 
 	return (

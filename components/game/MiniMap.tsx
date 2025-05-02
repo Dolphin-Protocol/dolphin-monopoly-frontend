@@ -4,9 +4,10 @@ import { IoClose } from "react-icons/io5";
 import { FaMap } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { ApiHouseCell } from "@/types/socket";
 
-const MiniMap = () => {
+
+const MiniMap = ({ houses }: { houses: ApiHouseCell[] }) => {
 	const [isOpen, setIsOpen] = useState(true);
 
 	if (!isOpen) {
@@ -59,12 +60,11 @@ const MiniMap = () => {
 								index % 6 === 0 ||
 								index % 6 === 5;
 
-							// Check if it's a corner cell
 							const isCorner =
-								index === 0 || // top-left
-								index === 5 || // top-right
-								index === 30 || // bottom-left
-								index === 35; // bottom-right
+								index === 0 ||
+								index === 5 ||
+								index === 30 ||
+								index === 35;
 
 							return (
 								<div

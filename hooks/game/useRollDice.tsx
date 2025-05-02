@@ -37,22 +37,18 @@ export const useRollDice = (): UseRollDiceReturn => {
 		setIsLoading(true);
 
 		try {
-			// 創建骰子擲出交易
 			const ptb = game.playerMove(address, turnCap);
 
-			// 執行交易
 			const result = await executeTransactionWithoutSponsorship({
 				tx: ptb,
 				options: { showEvents: true },
 			});
 
-			// 解析骰子事件
-			// 這邊應該會由 socket 來處理
 			if (!result) {
 				throw new Error("Failed to roll dice");
 			}
 			const rollDiceEvents = game.parseRollDiceEvent(result);
-			return rollDiceEvents;
+			return rollDiceEvents[0].diceNum;
 		} catch (err: any) {
 			console.error("Error rolling dice:", err);
 			setError(err.message || "Failed to roll dice");

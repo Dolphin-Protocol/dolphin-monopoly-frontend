@@ -4,7 +4,6 @@ import React, { useEffect, useRef } from "react";
 import Phaser from "phaser";
 import { Socket } from "socket.io-client";
 import MonopolyScene from "./gameClass";
-import { PlayerState } from "@/types/game";
 
 export default function PhaserGame({
 	socket,
@@ -21,8 +20,6 @@ export default function PhaserGame({
 			gameRef.current.destroy(true);
 			gameRef.current = null;
 		}
-
-		console.log("初始化 Phaser 遊戲");
 
 		const config: Phaser.Types.Core.GameConfig = {
 			type: Phaser.AUTO,

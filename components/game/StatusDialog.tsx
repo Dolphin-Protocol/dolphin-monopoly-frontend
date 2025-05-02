@@ -16,6 +16,7 @@ interface GameStatusProps {
 }
 
 const StatusDialog: React.FC<GameStatusProps> = ({ messages }) => {
+	console.log(`messages: ${messages[messages.length - 1]}`)
 	return (
 		<Card className="absolute bottom-4 left-4 w-80 max-h-96 overflow-hidden transition-all hover:shadow-lg border-primary bg-background/95 backdrop-blur shadow-xl rounded-xl">
 			<div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent pointer-events-none" />
