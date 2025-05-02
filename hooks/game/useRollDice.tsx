@@ -14,21 +14,12 @@ interface UseRollDiceReturn {
 export const useRollDice = (): UseRollDiceReturn => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const { game, turnCap } = useGameActionContext();
+	const { game, fetchTurnCap } = useGameActionContext();
 	const { address, executeTransactionWithoutSponsorship } = useCustomWallet();
 
 	const rollDice = useCallback(async () => {
-		console.log("rollDice");
 		if (!game) {
 			setError("No active game");
-			return null;
-		}
-
-		console.log("game", game);
-		console.log("turnCap", turnCap);
-
-		if (!turnCap) {
-			setError("No turnCap");
 			return null;
 		}
 
@@ -37,9 +28,13 @@ export const useRollDice = (): UseRollDiceReturn => {
 			return null;
 		}
 
-		setIsLoading(true);
+		const turnCap = await fetchTurnCap();
+		if (!turnCap) {
+			setError("No turnCap");
+			return null;
+		}
 
-		console.log("address", address);
+		setIsLoading(true);
 
 		try {
 			// 創建骰子擲出交易
@@ -51,15 +46,12 @@ export const useRollDice = (): UseRollDiceReturn => {
 				options: { showEvents: true },
 			});
 
-			console.log("result", result);
-
 			// 解析骰子事件
 			// 這邊應該會由 socket 來處理
 			if (!result) {
 				throw new Error("Failed to roll dice");
 			}
 			const rollDiceEvents = game.parseRollDiceEvent(result);
-			console.log("rollDiceEvents", rollDiceEvents);
 			return rollDiceEvents;
 		} catch (err: any) {
 			console.error("Error rolling dice:", err);
@@ -68,7 +60,7 @@ export const useRollDice = (): UseRollDiceReturn => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [game, address, executeTransactionWithoutSponsorship, turnCap]);
+	}, [game, address, executeTransactionWithoutSponsorship, fetchTurnCap]);
 
 	return {
 		isLoading,

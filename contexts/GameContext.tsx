@@ -48,8 +48,29 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		if (!socket) return;
 		if (!roomId) return;
 
-		socket.emit("gameState", { roomId });
-		socket.emit("ChangeTurn", { roomId });
+		const checkSocketAndSendRequests = () => {
+			if (socket.connected) {
+				console.log("Socket is connected, sending requests with delay");
+
+				// 先請求遊戲狀態
+				setTimeout(() => {
+					console.log("Emitting gameState event");
+					socket.emit("gameState", { roomId });
+				}, 1000);
+
+				// 再請求換回合資訊，稍微延遲確保順序
+				setTimeout(() => {
+					console.log("Emitting ChangeTurn event");
+					socket.emit("ChangeTurn", { roomId });
+				}, 1500);
+			} else {
+				console.log("Socket not connected yet, waiting...");
+				setTimeout(checkSocketAndSendRequests, 1000);
+			}
+		};
+
+		// 立即開始檢查
+		checkSocketAndSendRequests();
 
 		socket.on("gameState", (data) => {
 			console.log("gameState", data);
@@ -86,6 +107,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 			socket.off("Move");
 			socket.off("ActionRequest");
 			socket.off("Buy");
+			socket.off("PayHouseToll");
 		};
 	}, [address, socket, roomId]);
 
