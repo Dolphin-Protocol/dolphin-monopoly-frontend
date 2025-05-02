@@ -36,10 +36,6 @@ export default function GamePage() {
 	const [error, setError] = useState<string | null>(null);
 	const { roomId } = useParams<{ roomId: string }>();
 
-	// console.log("turnAddress", turnAddress);
-	// console.log("players", players);
-	// console.log("currentPlayerIndex", currentPlayerIndex);
-
 	useEffect(() => {
 		try {
 			if (!roomData) return;
