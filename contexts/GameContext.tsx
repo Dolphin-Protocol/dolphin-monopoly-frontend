@@ -72,29 +72,42 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		});
 
 		socket.on("ChangeTurn", (data) => {
+			if (!data.player) return;
 			console.log("ChangeTurn", data);
-      if(!data.player) return;
 			setTurnAddress(data.player);
 			setIsTurn(data.player === address);
-			setMessages([...messages, `is ${data.player.slice(0, 5)}... turn`]);
 		});
 		socket.on("Move", (data) => {
+			if (!data.player) return;
 			console.log("Move", data);
-      if(!data.player) return;
-			setMessages([...messages, `${data.player.slice(0, 5)}... move to ${data.position}`]);
+			setMessages((prevMessages) => [
+				...prevMessages,
+				`${data.player.slice(0, 5)}... move to ${data.position}`,
+			]);
 		});
 		socket.on("ActionRequest", (data) => {
 			console.log("ActionRequest", data);
-      if(!data.player) return;
-			setMessages([...messages, `${data.player.slice(0, 5)}... action request`]);
+			if (!data.player) return;
+			setMessages((prevMessages) => [
+				...prevMessages,
+				`${data.player.slice(0, 5)}... action request`,
+			]);
 		});
 		socket.on("Buy", (data) => {
-			if(!data.player) return;
-			setMessages([...messages, `${data.player.slice(0, 5)}... buy house`]);
+			if (!data.player) return;
+			console.log("Buy", data);
+			setMessages((prevMessages) => [
+				...prevMessages,
+				`${data.player.slice(0, 5)}... buy house`,
+			]);
 		});
 		socket.on("PayHouseToll", (data) => {
-			if(!data.player) return;
-			setMessages([...messages, `${data.player.slice(0, 5)}... pay rent`]);
+			if (!data.player) return;
+			console.log("PayHouseToll", data);
+			setMessages((prevMessages) => [
+				...prevMessages,
+				`${data.player.slice(0, 5)}... pay rent`,
+			]);
 		});
 
 		socket.on("error", (data) => {
