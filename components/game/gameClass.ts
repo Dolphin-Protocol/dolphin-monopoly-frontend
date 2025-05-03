@@ -522,6 +522,7 @@ class MonopolyScene extends Phaser.Scene {
 			);
 			if (playerIndex === -1) return;
 			console.log("playerIndex", playerIndex);
+			// TODO: 等後端改完要改回來
 			const nextPlayerIndex =
 				(playerIndex + 1) % this.players.length;
 			const nextPlayer = this.players[nextPlayerIndex];

@@ -15,6 +15,8 @@ import { Home, Coins, MapPin, Dice5 } from "lucide-react";
 import Dice from "react-dice-roll";
 import { useRollDice } from "@/hooks/game/useRollDice";
 import { useBuyHouse } from "@/hooks/game/useBuyHouse";
+import getPlayerColor from "@/utils/utils";
+import PLAYER_COLORS from "@/constants/colors";
 
 interface GamepadProps {
 	playerState: PlayerState | null;
@@ -56,6 +58,10 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 		executeBuy(true);
 	};
 
+	const playerColor = playerState
+		? getPlayerColor(playerState.playerIndex)
+		: PLAYER_COLORS[1];
+
 	if (!playerState) return null;
 
 	return (
@@ -68,7 +74,11 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 					<CardTitle className="text-lg font-bold">
 						Game Control
 					</CardTitle>
-					<Badge variant="secondary" className="uppercase text-xs">
+					<Badge
+						variant="secondary"
+						className="uppercase text-xs"
+						style={{ backgroundColor: playerColor.hex, color: playerColor.textColor }}
+					>
 						Player {playerState.playerIndex}
 					</Badge>
 				</div>
@@ -102,7 +112,7 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 						variant="outline"
 						className="bg-background/80 font-mono"
 					>
-						{playerState.position.x}, {playerState.position.y}
+						{playerState.positionIndex}
 					</Badge>
 				</div>
 

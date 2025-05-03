@@ -16,18 +16,20 @@ const SOCKET_URL = "http://5.183.11.9:3003";
 
 type Price = {
 	level: number;
-	value: number;
+	price: string;
 };
 
-type HouseCell = {
+export type HouseCell = {
 	id: string;
 	owner: string;
 	level: number;
 	position: number;
-	buyPrice: Price;
-	sellPrice: Price;
-	rentPrice: Price;
+	buyPrice: Price[];
+	sellPrice: Price[];
+	rentPrice: Price[];
 };
+
+
 
 interface ServerToClientEvents {
 	rooms: (data: { rooms: Room[] }) => void;

@@ -15,29 +15,14 @@ import { useCustomWallet } from "@/contexts/WalletContext";
 import { useGameActionContext } from "@/contexts/GameActionContext";
 
 export default function GamePage() {
-	const { isTurn, roomData, messages } = useGame();
+	const { isTurn, playerState, messages } = useGame();
 	const { rounds } = useGameActionContext();
 	const { socket } = useSocket();
 	const { roomId } = useParams<{ roomId: string }>();
-	const [player, setPlayer] = useState<PlayerState | null>(null);
+	
 	const [error, setError] = useState<string | null>(null);
 	const { address } = useCustomWallet();
 
-	useEffect(() => {
-		try {
-			if (!roomData) return;
-			const players = initializeDefaultPlayers(roomData);
-			const selectedPlayer = players.find((player) => player.address === address);
-			if (!selectedPlayer) return;
-			setPlayer(selectedPlayer);
-		} catch (err) {
-			setError(
-				err instanceof Error
-					? err.message
-					: "Failed to initialize players"
-			);
-		}
-	}, [roomData, initializeDefaultPlayers]);
 
 	// if (error) {
 	// 	return (
@@ -59,7 +44,7 @@ export default function GamePage() {
 		<div className="w-full h-full relative">
 			<PhaserGame socket={socket} roomId={roomId} rounds={rounds} />
 			{/* <MiniMap houses={roomData.houseCell} /> */}
-			<Gamepad playerState={player} isTurn={isTurn} />
+			<Gamepad playerState={playerState} isTurn={isTurn} />
 			<StatusDialog messages={messages} />
 		</div>
 	);
