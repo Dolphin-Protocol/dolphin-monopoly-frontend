@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import { useCustomWallet } from "./WalletContext";
 import { HouseCell, useSocket } from "./SocketContext";
-import { ApiRoomData } from "../types/socket";
+import { ApiHouseCell, ApiRoomData } from "../types/socket";
 import { useParams } from "next/navigation";
 import { PlayerState } from "@/types/game";
 import { initializeDefaultPlayers } from "@/utils/gameAdapter";
@@ -21,6 +21,7 @@ interface GameContextType {
 	roomData: ApiRoomData | null;
 	messages: string[];
 	playerState: PlayerState | null;
+	houseCell: ApiHouseCell[];
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -48,6 +49,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 	const [roomData, setRoomData] = useState<ApiRoomData | null>(null);
 	const [messages, setMessages] = useState<string[]>([]);
 	const [playerState, setPlayerState] = useState<PlayerState | null>(null);
+	const [houseCell, setHouseCell] = useState<ApiHouseCell[]>([]);
 
 	const { roomId } = useParams<{ roomId: string }>();
 
@@ -57,6 +59,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 			console.log("gameState", data);
 			if (!data) return;
 			setRoomData(data.gameState);
+			setHouseCell(data.gameState.houseCell);
 			const players = initializeDefaultPlayers(data.gameState);
 			const selectedPlayer = players.find(
 				(player) => player.address === address
@@ -110,6 +113,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		]);
 	}, []);
 
+	// TODO: 等後端改完要改回來
 	const handleBuy = useCallback(
 		(data: {
 			player: string;
@@ -238,6 +242,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		roomData,
 		messages,
 		playerState,
+		houseCell,
 	};
 
 	return (

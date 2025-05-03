@@ -39,7 +39,7 @@ class MonopolyScene extends Phaser.Scene {
 	isBuying: boolean = false;
 	hasInitializedPlayers: boolean = false;
 	hasInitializedHouses: boolean = false;
-	rounds: number = 0 ;
+	rounds: number = 0;
 
 	constructor(socket: Socket, roomId: string, rounds: number) {
 		super("MonopolyScene");
@@ -246,7 +246,8 @@ class MonopolyScene extends Phaser.Scene {
 					console.log("defaultPlayers", defaultPlayers);
 					this.playerStates = defaultPlayers;
 					console.log("this.playerStates", this.playerStates);
-					if (this.rounds === null || this.rounds === undefined) return;
+					if (this.rounds === null || this.rounds === undefined)
+						return;
 					console.log("this.rounds", this.rounds);
 					if (!this.hasInitializedPlayers) {
 						this.initializePlayers(map);
@@ -256,6 +257,7 @@ class MonopolyScene extends Phaser.Scene {
 
 				this.createAnimations();
 				this.setupSocketListeners();
+				this.setupControl();
 			}
 		} catch (error) {
 			console.error("Create 錯誤:", error);
@@ -397,47 +399,46 @@ class MonopolyScene extends Phaser.Scene {
 						playerOneState.position.y * tileSize + tileSize / 2,
 						"Player_one",
 						getFrameByDirection(playerOneState.direction)
-			),
+					),
 					state: playerOneState,
-				}
+			  }
 			: null;
 
 		const playerTwo = this.playerStates[1]
 			? {
 					sprite: this.add.sprite(
-				playerTwoState.position.x * tileSize + tileSize / 2,
-				playerTwoState.position.y * tileSize + tileSize / 2,
-				"Player_two",
-				getFrameByDirection(playerTwoState.direction)
-			),
+						playerTwoState.position.x * tileSize + tileSize / 2,
+						playerTwoState.position.y * tileSize + tileSize / 2,
+						"Player_two",
+						getFrameByDirection(playerTwoState.direction)
+					),
 					state: playerTwoState,
-				}
-			: null;		
+			  }
+			: null;
 
 		const playerThree = this.playerStates[2]
 			? {
 					sprite: this.add.sprite(
-				playerThreeState.position.x * tileSize + tileSize / 2,
-				playerThreeState.position.y * tileSize + tileSize / 2,
-				"Player_three",
-				getFrameByDirection(playerThreeState.direction)
-			),
+						playerThreeState.position.x * tileSize + tileSize / 2,
+						playerThreeState.position.y * tileSize + tileSize / 2,
+						"Player_three",
+						getFrameByDirection(playerThreeState.direction)
+					),
 					state: playerThreeState,
-				}
+			  }
 			: null;
 
 		const playerFour = this.playerStates[3]
 			? {
 					sprite: this.add.sprite(
-				playerFourState.position.x * tileSize + tileSize / 2,
-				playerFourState.position.y * tileSize + tileSize / 2,
-				"Player_four",
-				getFrameByDirection(playerFourState.direction)
-			),
+						playerFourState.position.x * tileSize + tileSize / 2,
+						playerFourState.position.y * tileSize + tileSize / 2,
+						"Player_four",
+						getFrameByDirection(playerFourState.direction)
+					),
 					state: playerFourState,
-				}
+			  }
 			: null;
-
 
 		this.players = [playerOne, playerTwo, playerFour].filter(
 			(player) => player !== null
@@ -488,6 +489,74 @@ class MonopolyScene extends Phaser.Scene {
 		this.hasInitializedHouses = true;
 	}
 
+	setupControl() {
+		const qKey = this.input.keyboard!.addKey("Q");
+		const eKey = this.input.keyboard!.addKey("E");
+
+		const minZoom = 2;
+		const maxZoom = 6;
+
+		qKey.on("down", () => {
+			const newZoom = this.cameras.main.zoom + 0.1;
+			this.cameras.main.setZoom(
+				Phaser.Math.Clamp(newZoom, minZoom, maxZoom)
+			);
+		});
+
+		eKey.on("down", () => {
+			const newZoom = this.cameras.main.zoom - 0.1;
+			this.cameras.main.setZoom(
+				Phaser.Math.Clamp(newZoom, minZoom, maxZoom)
+			);
+		});
+
+		const upKey = this.input.keyboard!.addKey("W"); // 上
+		const downKey = this.input.keyboard!.addKey("S"); // 下
+		const leftKey = this.input.keyboard!.addKey("A"); // 左
+		const rightKey = this.input.keyboard!.addKey("D"); // 右
+
+		// 定义每次按键移动的像素数
+		const moveDistance = 16; // 一个瓦片的大小
+
+		// 上移动
+		upKey.on("down", () => {
+			this.cameras.main.stopFollow();
+			this.cameras.main.scrollY -= moveDistance; 
+		});
+
+		// 下移动
+		downKey.on("down", () => {
+			this.cameras.main.stopFollow();
+			this.cameras.main.scrollY += moveDistance;
+		});
+
+		// 左移动
+		leftKey.on("down", () => {
+			this.cameras.main.stopFollow();
+			this.cameras.main.scrollX -= moveDistance;
+		});
+
+		// 右移动
+		rightKey.on("down", () => {
+			this.cameras.main.stopFollow();
+			this.cameras.main.scrollX += moveDistance;
+		});
+	}
+
+	// constrainCamera() {
+	// 	const bounds = this.cameras.main.getBounds();
+	// 	const camera = this.cameras.main;
+
+	// 	// 允许相机移动到地图的绝对边缘
+	// 	camera.scrollX = Phaser.Math.Clamp(camera.scrollX, 0, bounds.width);
+	// 	camera.scrollY = Phaser.Math.Clamp(camera.scrollY, 0, bounds.height);
+
+	// 	console.log("相机位置:", {
+	// 		x: camera.scrollX,
+	// 		y: camera.scrollY,
+	// 	});
+	// }
+
 	setupSocketListeners() {
 		this.socket.on("Move", ({ player, position }) => {
 			console.log("收到骰子事件:", player, position);
@@ -523,8 +592,7 @@ class MonopolyScene extends Phaser.Scene {
 			if (playerIndex === -1) return;
 			console.log("playerIndex", playerIndex);
 			// TODO: 等後端改完要改回來
-			const nextPlayerIndex =
-				(playerIndex + 1) % this.players.length;
+			const nextPlayerIndex = (playerIndex + 1) % this.players.length;
 			const nextPlayer = this.players[nextPlayerIndex];
 
 			// 平滑過渡到新的玩家
