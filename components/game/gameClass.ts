@@ -543,20 +543,6 @@ class MonopolyScene extends Phaser.Scene {
 		});
 	}
 
-	// constrainCamera() {
-	// 	const bounds = this.cameras.main.getBounds();
-	// 	const camera = this.cameras.main;
-
-	// 	// 允许相机移动到地图的绝对边缘
-	// 	camera.scrollX = Phaser.Math.Clamp(camera.scrollX, 0, bounds.width);
-	// 	camera.scrollY = Phaser.Math.Clamp(camera.scrollY, 0, bounds.height);
-
-	// 	console.log("相机位置:", {
-	// 		x: camera.scrollX,
-	// 		y: camera.scrollY,
-	// 	});
-	// }
-
 	setupSocketListeners() {
 		this.socket.on("Move", ({ player, position }) => {
 			console.log("收到骰子事件:", player, position);

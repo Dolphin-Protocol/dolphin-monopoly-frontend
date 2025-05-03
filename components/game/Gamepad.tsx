@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Home, Coins, MapPin, Dice5 } from "lucide-react";
+import { IoClose } from "react-icons/io5";
+import { FaUser } from "react-icons/fa";
 import Dice from "react-dice-roll";
 import { useRollDice } from "@/hooks/game/useRollDice";
 import { useBuyHouse } from "@/hooks/game/useBuyHouse";
@@ -25,6 +27,7 @@ interface GamepadProps {
 
 const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 	const [diceValue, setDiceValue] = useState<number | null>(null);
+	const [isOpen, setIsOpen] = useState(true); // 添加 isOpen 状态
 	const diceRef = useRef<any>(null);
 	const { rollDice, isLoading } = useRollDice();
 	const { executeBuy } = useBuyHouse();
@@ -64,6 +67,22 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 
 	if (!playerState) return null;
 
+	// 添加折叠状态的渲染
+	if (!isOpen) {
+		return (
+			<div className="absolute top-4 right-4 z-50">
+				<Button
+					variant="default"
+					size="icon"
+					onClick={() => setIsOpen(true)}
+					className="w-10 h-10 rounded-full shadow-md"
+				>
+					<FaUser size={16} />
+				</Button>
+			</div>
+		);
+	}
+
 	return (
 		<Card className="absolute top-4 right-4 w-72 overflow-hidden transition-all hover:shadow-lg border-primary bg-background/95 backdrop-blur shadow-xl rounded-xl">
 			<div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
@@ -74,13 +93,27 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 					<CardTitle className="text-lg font-bold">
 						Game Control
 					</CardTitle>
-					<Badge
-						variant="secondary"
-						className="uppercase text-xs"
-						style={{ backgroundColor: playerColor.hex, color: playerColor.textColor }}
-					>
-						Player {playerState.playerIndex}
-					</Badge>
+					<div className="flex items-center gap-2">
+						<Badge
+							variant="secondary"
+							className="uppercase text-xs"
+							style={{
+								backgroundColor: playerColor.hex,
+								color: playerColor.textColor,
+							}}
+						>
+							Player {playerState.playerIndex}
+						</Badge>
+						{/* 添加关闭按钮 */}
+						<Button
+							variant="outline"
+							size="icon"
+							onClick={() => setIsOpen(false)}
+							className="w-6 h-6 rounded-full bg-background/80"
+						>
+							<IoClose size={14} />
+						</Button>
+					</div>
 				</div>
 				<div className="h-px w-full bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30" />
 			</CardHeader>
@@ -162,7 +195,7 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 					<span className="absolute inset-0 w-full h-full bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 group-hover:translate-x-full transition-transform duration-700 ease-in-out -z-10" />
 					<Dice5 className="mr-2 h-5 w-5" />
 					{isLoading ? "Connecting..." : "Roll Dice"}
-					</Button>
+				</Button>
 				<Button
 					onClick={handleBuyHouse}
 					variant="default"

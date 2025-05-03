@@ -1,7 +1,7 @@
 "use client";
 
 import PhaserGame from "@/components/game/PhaserGame";
-import MiniMap from "@/components/game/MiniMap";
+import GameControlHelp from "@/components/game/GameControlHelp";
 import Gamepad from "@/components/game/Gamepad";
 import StatusDialog from "@/components/game/StatusDialog";
 import { useGame } from "@/contexts/GameContext";
@@ -18,7 +18,7 @@ export default function GamePage() {
 	return (
 		<div className="w-full h-full relative">
 			<PhaserGame socket={socket} roomId={roomId} rounds={rounds} />
-			{/* <MiniMap houses={houseCell} /> */}
+			<GameControlHelp />
 			<Gamepad playerState={playerState} isTurn={isTurn} />
 			<StatusDialog messages={messages} />
 		</div>

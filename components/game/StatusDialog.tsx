@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
 	Card,
 	CardContent,
@@ -10,12 +10,39 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { IoClose } from "react-icons/io5";
+import { FaComment } from "react-icons/fa";
 
 interface GameStatusProps {
 	messages: string[];
 }
 
 const StatusDialog: React.FC<GameStatusProps> = ({ messages }) => {
+	const [isOpen, setIsOpen] = useState(true); // 添加 isOpen 状态
+
+	// 如果折叠，只显示图标按钮
+	if (!isOpen) {
+		return (
+			<div className="absolute bottom-4 left-4 z-50">
+				<Button
+					variant="default"
+					size="icon"
+					onClick={() => setIsOpen(true)}
+					className="w-10 h-10 rounded-full shadow-md"
+					title="Game Status"
+				>
+					<FaComment size={16} />
+					{messages.length > 0 && (
+						<span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-[10px] flex items-center justify-center text-white">
+							{messages.length}
+						</span>
+					)}
+				</Button>
+			</div>
+		);
+	}
+
 	return (
 		<Card className="absolute bottom-4 left-4 w-80 max-h-96 overflow-hidden transition-all hover:shadow-lg border-primary bg-background/95 backdrop-blur shadow-xl rounded-xl">
 			<div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent pointer-events-none" />
@@ -29,9 +56,20 @@ const StatusDialog: React.FC<GameStatusProps> = ({ messages }) => {
 							Game Status
 						</CardTitle>
 					</div>
-					<Badge variant="outline" className="bg-background/80">
-						{messages.length}
-					</Badge>
+					<div className="flex items-center gap-2">
+						<Badge variant="outline" className="bg-background/80">
+							{messages.length}
+						</Badge>
+						{/* 添加关闭按钮 */}
+						<Button
+							variant="outline"
+							size="icon"
+							onClick={() => setIsOpen(false)}
+							className="w-6 h-6 rounded-full bg-background/80"
+						>
+							<IoClose size={14} />
+						</Button>
+					</div>
 				</div>
 				<div className="h-px w-full bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30" />
 			</CardHeader>
@@ -53,7 +91,6 @@ const StatusDialog: React.FC<GameStatusProps> = ({ messages }) => {
 							</div>
 							<div className="flex-1">
 								<p className="text-sm">{message}</p>
-								
 							</div>
 						</div>
 					))
