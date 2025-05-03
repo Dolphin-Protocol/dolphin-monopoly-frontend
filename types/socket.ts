@@ -2,7 +2,7 @@
 export interface ApiRoomInfo {
   roomId: string;
   gameId: string;
-  gameState: "started" | "waiting" | "ended"; // 可根据实际情况扩展
+  gameState: "started" | "waiting" | "ended"; 
 }
 
 // 玩家状态类型

@@ -27,8 +27,6 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 	const { rollDice, isLoading } = useRollDice();
 	const { executeBuy } = useBuyHouse();
 
-	console.log(`isTurn: ${isTurn}`);
-
 	const handleRollClick = async () => {
 		if (isLoading || !diceRef.current) return;
 

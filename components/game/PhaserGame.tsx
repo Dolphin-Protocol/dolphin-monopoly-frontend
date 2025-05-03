@@ -8,15 +8,19 @@ import MonopolyScene from "./gameClass";
 export default function PhaserGame({
 	socket,
 	roomId,
+	rounds,
 }: {
 	socket: Socket;
 	roomId: string;
+	rounds: number | null;
 }) {
 	const gameRef = useRef<Phaser.Game | null>(null);
 
 	useEffect(() => {
-		// 如果已經有遊戲實例，先銷毀它
+		console.log("rounds", rounds);
+		if (rounds === null) return;
 		if (gameRef.current) {
+			console.log("銷毀 Phaser 遊戲");
 			gameRef.current.destroy(true);
 			gameRef.current = null;
 		}
@@ -35,7 +39,7 @@ export default function PhaserGame({
 			audio: {
 				noAudio: true,
 			},
-			scene: [new MonopolyScene(socket, roomId)],
+			scene: [new MonopolyScene(socket, roomId, rounds)],
 		};
 
 		gameRef.current = new Phaser.Game(config);
@@ -45,7 +49,7 @@ export default function PhaserGame({
 			gameRef.current?.destroy(true);
 			gameRef.current = null;
 		};
-	}, [socket, roomId]);
+	}, [socket, roomId, rounds]);
 
 	return (
 		<div

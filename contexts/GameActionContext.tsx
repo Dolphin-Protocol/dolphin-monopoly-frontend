@@ -9,7 +9,7 @@ import React, {
 	ReactNode,
 } from "react";
 import { useSuiClient } from "@mysten/dapp-kit";
-import { MonopolyGame } from "@sui-dolphin/monopoly-sdk";
+import { getGame, MonopolyGame } from "@sui-dolphin/monopoly-sdk";
 import {
 	Game,
 	TurnCap,
@@ -21,10 +21,12 @@ import { useGame } from "./GameContext";
 interface GameActionContextType {
 	game: MonopolyGame | null;
 	turnCap: TurnCap | null;
+	rounds: number | null;	
 	isLoading: boolean;
 	error: string | null;
 	fetchGameById: (gameId: string) => Promise<MonopolyGame | null>;
 	fetchTurnCap: () => Promise<TurnCap | null>;
+	fetchRounds: () => Promise<number | undefined>;
 	setError: (error: string | null) => void;
 	setIsLoading: (loading: boolean) => void;
 }
@@ -32,10 +34,12 @@ interface GameActionContextType {
 const GameActionContext = createContext<GameActionContextType>({
 	game: null,
 	turnCap: null,
+	rounds: null,
 	isLoading: false,
 	error: null,
 	fetchGameById: async () => null,
 	fetchTurnCap: async () => null,
+	fetchRounds: async () => undefined,
 	setError: () => {},
 	setIsLoading: () => {},
 });
@@ -49,9 +53,9 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 	const [error, setError] = useState<string | null>(null);
 	const { address } = useCustomWallet();
 	const { roomData, isTurn } = useGame();
+	const [rounds, setRounds] = useState<number | null>(null);
 	const suiClient = useSuiClient();
 
-	// 通過ID獲取 TurnCap
 	const fetchTurnCap = useCallback(
 		async () => {
 			if (!game) {
@@ -137,6 +141,14 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 		[suiClient]
 	);
 
+	const fetchRounds = useCallback(async () => {
+		if (!game?.game.id || !address) return;
+		const gameObj = await getGame(suiClient, game.game.id);
+		const rounds = Number(gameObj.plays);
+		setRounds(rounds);
+		return rounds;
+	}, [game, suiClient]);
+
 	useEffect(() => {
 		if (!roomData?.roomInfo?.gameId || !address) return;
 		const gameId = roomData.roomInfo.gameId;
@@ -148,15 +160,22 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 		fetchTurnCap();
 	}, [game, address, fetchTurnCap, isTurn]);
 
+	useEffect(() => {
+		if (!game || !address) return;
+		fetchRounds();
+	}, [game, address, fetchRounds]);
+
 	return (
 		<GameActionContext.Provider
 			value={{
 				game,
 				turnCap,
+				rounds,
 				isLoading,
 				error,
 				fetchGameById,
 				fetchTurnCap,
+				fetchRounds,
 				setError,
 				setIsLoading,
 			}}

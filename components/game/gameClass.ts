@@ -39,8 +39,9 @@ class MonopolyScene extends Phaser.Scene {
 	isBuying: boolean = false;
 	hasInitializedPlayers: boolean = false;
 	hasInitializedHouses: boolean = false;
+	rounds: number = 0 ;
 
-	constructor(socket: Socket, roomId: string) {
+	constructor(socket: Socket, roomId: string, rounds: number) {
 		super("MonopolyScene");
 		this.socket = socket;
 		this.playerStates = [];
@@ -52,6 +53,7 @@ class MonopolyScene extends Phaser.Scene {
 		this.isBuying = false;
 		this.hasInitializedPlayers = false;
 		this.hasInitializedHouses = false;
+		this.rounds = rounds;
 	}
 
 	preload() {
@@ -229,7 +231,9 @@ class MonopolyScene extends Phaser.Scene {
 				const camera = this.cameras.main;
 				camera.setZoom(4);
 				camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-				
+
+				this.socket.emit("gameState", { roomId: this.roomId });
+
 				this.socket.on("gameState", (data) => {
 					console.log("收到遊戲狀態", data);
 					if (!data || !data.gameState) {
@@ -241,13 +245,15 @@ class MonopolyScene extends Phaser.Scene {
 					);
 					console.log("defaultPlayers", defaultPlayers);
 					this.playerStates = defaultPlayers;
+					console.log("this.playerStates", this.playerStates);
+					if (this.rounds === null || this.rounds === undefined) return;
+					console.log("this.rounds", this.rounds);
 					if (!this.hasInitializedPlayers) {
 						this.initializePlayers(map);
 					}
 					this.initializeHouses();
-					this.socket.emit("ChangeTurn", { roomId: this.roomId });
 				});
-				
+
 				this.createAnimations();
 				this.setupSocketListeners();
 			}
@@ -347,7 +353,7 @@ class MonopolyScene extends Phaser.Scene {
 	}
 
 	initializePlayers(map: Phaser.Tilemaps.Tilemap) {
-		// 根据方向获取对应的帧索引
+		console.log("initializePlayers 開始執行");
 		const getFrameByDirection = (direction: string): number => {
 			switch (direction) {
 				case "down":
@@ -365,69 +371,80 @@ class MonopolyScene extends Phaser.Scene {
 
 		// 使用传入的状态，如果没有则使用默认状态
 		const playerOneState =
-			this.playerStates && this.playerStates.length > 0
+			this.playerStates[0] && this.playerStates.length > 0
 				? this.playerStates[0]
 				: PLAYER_ONE_DEFAULT_STATE;
 
 		const playerTwoState =
-			this.playerStates && this.playerStates.length > 1
+			this.playerStates[1] && this.playerStates.length > 1
 				? this.playerStates[1]
 				: PLAYER_TWO_DEFAULT_STATE;
 
 		const playerThreeState =
-			this.playerStates && this.playerStates.length > 2
+			this.playerStates[2] && this.playerStates.length > 2
 				? this.playerStates[2]
 				: PLAYER_THREE_DEFAULT_STATE;
 
 		const playerFourState =
-			this.playerStates && this.playerStates.length > 3
+			this.playerStates[3] && this.playerStates.length > 3
 				? this.playerStates[3]
 				: PLAYER_FOUR_DEFAULT_STATE;
 
-		const playerOne = {
-			sprite: this.add.sprite(
-				playerOneState.position.x * tileSize + tileSize / 2,
-				playerOneState.position.y * tileSize + tileSize / 2,
-				"Player_one",
-				getFrameByDirection(playerOneState.direction)
+		const playerOne = this.playerStates[0]
+			? {
+					sprite: this.add.sprite(
+						playerOneState.position.x * tileSize + tileSize / 2,
+						playerOneState.position.y * tileSize + tileSize / 2,
+						"Player_one",
+						getFrameByDirection(playerOneState.direction)
 			),
-			state: playerOneState,
-		};
+					state: playerOneState,
+				}
+			: null;
 
-		const playerTwo = {
-			sprite: this.add.sprite(
+		const playerTwo = this.playerStates[1]
+			? {
+					sprite: this.add.sprite(
 				playerTwoState.position.x * tileSize + tileSize / 2,
 				playerTwoState.position.y * tileSize + tileSize / 2,
 				"Player_two",
 				getFrameByDirection(playerTwoState.direction)
 			),
-			state: playerTwoState,
-		};
+					state: playerTwoState,
+				}
+			: null;		
 
-		const playerThree = {
-			sprite: this.add.sprite(
+		const playerThree = this.playerStates[2]
+			? {
+					sprite: this.add.sprite(
 				playerThreeState.position.x * tileSize + tileSize / 2,
 				playerThreeState.position.y * tileSize + tileSize / 2,
 				"Player_three",
 				getFrameByDirection(playerThreeState.direction)
 			),
-			state: playerThreeState,
-		};
+					state: playerThreeState,
+				}
+			: null;
 
-		const playerFour = {
-			sprite: this.add.sprite(
+		const playerFour = this.playerStates[3]
+			? {
+					sprite: this.add.sprite(
 				playerFourState.position.x * tileSize + tileSize / 2,
 				playerFourState.position.y * tileSize + tileSize / 2,
 				"Player_four",
 				getFrameByDirection(playerFourState.direction)
 			),
-			state: playerFourState,
-		};
+					state: playerFourState,
+				}
+			: null;
 
-		this.players = [playerOne, playerTwo, playerThree, playerFour];
-		const nextPlayer = this.players.find(
-			(player) => player.state.address === this.currentPlayerAddress
+
+		this.players = [playerOne, playerTwo, playerFour].filter(
+			(player) => player !== null
 		);
+		console.log("this.players", this.players);
+		const currentPlayerIndex = this.rounds % this.players.length;
+		const nextPlayer = this.players[currentPlayerIndex];
 		if (!nextPlayer) return;
 		this.cameras.main.pan(
 			nextPlayer.sprite.x,
@@ -504,8 +521,10 @@ class MonopolyScene extends Phaser.Scene {
 				(p) => p.state.address === player
 			);
 			if (playerIndex === -1) return;
-
-			const nextPlayer = this.players[playerIndex];
+			console.log("playerIndex", playerIndex);
+			const nextPlayerIndex =
+				(playerIndex + 1) % this.players.length;
+			const nextPlayer = this.players[nextPlayerIndex];
 
 			// 平滑過渡到新的玩家
 			this.cameras.main.pan(

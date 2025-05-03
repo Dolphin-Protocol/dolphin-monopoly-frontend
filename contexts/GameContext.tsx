@@ -55,10 +55,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 				setTimeout(() => {
 					socket.emit("gameState", { roomId });
 				}, 2000);
-
-				setTimeout(() => {
-					socket.emit("ChangeTurn", { roomId });
-				}, 2500);
 			} else {
 				setTimeout(checkSocketAndSendRequests, 1000);
 			}
@@ -67,6 +63,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		checkSocketAndSendRequests();
 
 		socket.on("gameState", (data) => {
+			console.log("gameState", data);
 			if (!data) return;
 			setRoomData(data.gameState);
 		});

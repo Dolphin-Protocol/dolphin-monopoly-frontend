@@ -33,6 +33,7 @@ export const useRollDice = (): UseRollDiceReturn => {
 			setError("No turnCap");
 			return null;
 		}
+		console.log("turnCap", turnCap);
 
 		setIsLoading(true);
 
@@ -43,7 +44,7 @@ export const useRollDice = (): UseRollDiceReturn => {
 				tx: ptb,
 				options: { showEvents: true },
 			});
-
+			console.log("result", result);
 			if (!result) {
 				throw new Error("Failed to roll dice");
 			}

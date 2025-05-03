@@ -12,9 +12,11 @@ import { PlayerState } from "@/types/game";
 import { useSocket } from "@/contexts/SocketContext";
 import { useParams } from "next/navigation";
 import { useCustomWallet } from "@/contexts/WalletContext";
+import { useGameActionContext } from "@/contexts/GameActionContext";
 
 export default function GamePage() {
 	const { isTurn, roomData, messages } = useGame();
+	const { rounds } = useGameActionContext();
 	const { socket } = useSocket();
 	const { roomId } = useParams<{ roomId: string }>();
 	const [player, setPlayer] = useState<PlayerState | null>(null);
@@ -55,7 +57,7 @@ export default function GamePage() {
 
 	return (
 		<div className="w-full h-full relative">
-			<PhaserGame socket={socket} roomId={roomId} />
+			<PhaserGame socket={socket} roomId={roomId} rounds={rounds} />
 			{/* <MiniMap houses={roomData.houseCell} /> */}
 			<Gamepad playerState={player} isTurn={isTurn} />
 			<StatusDialog messages={messages} />
