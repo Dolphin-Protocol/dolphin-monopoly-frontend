@@ -25,6 +25,7 @@ interface GamepadProps {
 	isTurn: boolean;
 }
 
+// 骰子邏輯以及按鈕顯示
 const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 	const [diceValue, setDiceValue] = useState<number | null>(null);
 	const [isOpen, setIsOpen] = useState(true); // 添加 isOpen 状态
@@ -146,21 +147,6 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 						className="bg-background/80 font-mono"
 					>
 						{playerState.positionIndex}
-					</Badge>
-				</div>
-
-				<div className="flex items-center justify-between bg-muted/30 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-					<div className="flex items-center gap-2">
-						<div className="bg-primary/10 p-1.5 rounded-md">
-							<Home className="h-4 w-4 text-primary" />
-						</div>
-						<span className="text-sm font-medium">Houses</span>
-					</div>
-					<Badge
-						variant="outline"
-						className="bg-background/80 font-mono"
-					>
-						{playerState.ownedHouses.length}
 					</Badge>
 				</div>
 
