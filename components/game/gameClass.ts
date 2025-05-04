@@ -1,6 +1,6 @@
 "use client";
 
-import Phaser from "phaser";
+import * as Phaser from "phaser";
 import { PlayerState, Position } from "@/types/game";
 import {
 	PLAYER_ONE_DEFAULT_STATE,
