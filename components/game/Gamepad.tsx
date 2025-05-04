@@ -26,7 +26,7 @@ const Gamepad: React.FC = () => {
 	const [isOpen, setIsOpen] = useState(true);
 	const diceRef = useRef<any>(null);
 	const { rollDice, isLoading } = useRollDice();
-	const { executeBuy } = useBuyHouse();
+	const { executeBuy, isLoading: isBuying } = useBuyHouse();
 	const { hasAction, playerState, isTurn, handleAction } = useGame();
 
 	const handleRollClick = async () => {
@@ -186,28 +186,26 @@ const Gamepad: React.FC = () => {
 						{isLoading ? "Connecting..." : "Roll Dice"}
 					</Button>
 				)}
-				{ (
-					<div className="flex items-center justify-center gap-2">
-						<Button
-							onClick={handleBuyHouse}
-							variant="action"
-							size="lg"
-							className="w-full"
-							disabled={hasAction}
-						>
-							Buy House
-						</Button>
-						<Button
-							onClick={handleSkip}
-							variant="cancel"
-							size="lg"
-							className="w-full"
-							disabled={hasAction}
-						>
-							Skip
-						</Button>
-					</div>
-				)}
+				<div className="flex items-center justify-center gap-2">
+					<Button
+						onClick={handleBuyHouse}
+						variant="action"
+						size="lg"
+						className="w-full"
+						disabled={isBuying}
+					>
+						Buy House
+					</Button>
+					<Button
+						onClick={handleSkip}
+						variant="cancel"
+						size="lg"
+						className="w-full"
+						disabled={isBuying}
+					>
+						Skip
+					</Button>
+				</div>
 			</CardFooter>
 		</Card>
 	);
