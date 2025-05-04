@@ -192,15 +192,15 @@ class MonopolyScene extends Phaser.Scene {
 				ChickenHousesTileset &&
 				BasicFurnitureTileset
 			) {
-				const waterLayer = map.createLayer("water", waterTileset);
-				const landLayer = map.createLayer("land", [
+				map.createLayer("water", waterTileset);
+				map.createLayer("land", [
 					GrassHillTileset,
 					DarkerGrassHillsTileset,
 					SoilGroundHiIlsTileset,
 					StoneGroundHillsTileset,
 					DarkerSoilGroundTileset,
 				]);
-				const backgroundItemsLayer = map.createLayer(
+				map.createLayer(
 					"background_items",
 					[
 						WaterObjectsTileset,
@@ -217,13 +217,13 @@ class MonopolyScene extends Phaser.Scene {
 						GrassHillTileset,
 					]
 				);
-				const grassLayer = map.createLayer("grass", [
+				 map.createLayer("grass", [
 					GrassTileLayersTileset,
 					GrassTileLayers2Tileset,
 					GrassHillTileset,
 					DarkerGrassHillsTileset,
 				]);
-				const housesLayer = map.createLayer(
+				map.createLayer(
 					"houses",
 					ChickenHousesTileset
 				);
@@ -250,7 +250,7 @@ class MonopolyScene extends Phaser.Scene {
 						return;
 					console.log("this.rounds", this.rounds);
 					if (!this.hasInitializedPlayers) {
-						this.initializePlayers(map);
+						this.initializePlayers();
 					}
 					this.initializeHouses();
 				});
@@ -354,7 +354,7 @@ class MonopolyScene extends Phaser.Scene {
 		}
 	}
 
-	initializePlayers(map: Phaser.Tilemaps.Tilemap) {
+	initializePlayers() {
 		console.log("initializePlayers 開始執行");
 		const getFrameByDirection = (direction: string): number => {
 			switch (direction) {
@@ -440,7 +440,7 @@ class MonopolyScene extends Phaser.Scene {
 			  }
 			: null;
 
-		this.players = [playerOne, playerTwo, playerFour].filter(
+		this.players = [playerOne, playerTwo, playerThree, playerFour].filter(
 			(player) => player !== null
 		);
 		console.log("this.players", this.players);

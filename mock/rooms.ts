@@ -5,24 +5,18 @@ export const mockRoomData: ApiRoomData = {
 		gameId: "0x386d711a2928f37c2831db8936a244f60727ebedab5427065db1a70d559768b2",
 		gameState: "started",
 	},
-	playersState: {
-		"0x56562324e35bd4b84f0ef3d6bd0b9b7ec6b1584d37731990c36e2848bcacd659": {
+	playersState: [
+		{
+			address: "0x56562324e35bd4b84f0ef3d6bd0b9b7ec6b1584d37731990c36e2848bcacd659",
 			balance: 2000,
 			position: 0,
 		},
-		"0x7c0bf358836ef1232b662095a306f231034a6ec028dbaa1d7bc960bab59378db": {
+		{
+			address: "0x7c0bf358836ef1232b662095a306f231034a6ec028dbaa1d7bc960bab59378db",
 			balance: 2000,
 			position: 0,
 		},
-		"0xfd198685e74aea79cf161b85b8bc96d940b7e24d7429e8dd8eaba8ab76309327": {
-			balance: 2000,
-			position: 0,
-		},
-		"0x8920ed1257a788ab0978f684e71df503f43b6b8bd484167cc486fda033333aee": {
-			balance: 2000,
-			position: 0,
-		},
-	},
+	],
 	houseCell: [
 		{
 			id: "0x3aa7390fb97913888f529ad4a5dc8a1fdb678581657ebf0fd0c8897714ac538a",

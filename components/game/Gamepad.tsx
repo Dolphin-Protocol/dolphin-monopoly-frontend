@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -20,11 +20,16 @@ import getPlayerColor from "@/utils/utils";
 import PLAYER_COLORS from "@/constants/colors";
 import { useGame } from "@/contexts/GameContext";
 
+// Define the type based on the type definition
+type DiceRef = {
+	rollDice: (value?: 1 | 2 | 3 | 4 | 5 | 6) => void;
+};
+
 // 骰子邏輯以及按鈕顯示
 const Gamepad: React.FC = () => {
 	const [diceValue, setDiceValue] = useState<number | null>(null);
 	const [isOpen, setIsOpen] = useState(true);
-	const diceRef = useRef<any>(null);
+	const diceRef = useRef<DiceRef>(null);
 	const { rollDice, isLoading } = useRollDice();
 	const { executeBuy, isLoading: isBuying } = useBuyHouse();
 	const { hasAction, playerState, isTurn, handleAction } = useGame();
@@ -47,7 +52,9 @@ const Gamepad: React.FC = () => {
 				setDiceValue(validValue);
 			}
 			setTimeout(() => {
-				diceRef.current.rollDice();
+				if (diceRef.current) {
+					diceRef.current.rollDice();
+				}
 			}, 100);
 		} catch (error) {
 			console.error("Error rolling dice:", error);

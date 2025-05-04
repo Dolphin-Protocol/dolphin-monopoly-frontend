@@ -44,7 +44,7 @@ export default function GameLobby() {
     try {
       setIsCreatingRoom(true);
 
-      const result = await createRoom(address);
+      await createRoom(address);
       toast.success("Room created successfully");
     } catch (error) {
       console.error("Failed to create room:", error);
