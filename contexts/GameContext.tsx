@@ -10,18 +10,19 @@ import React, {
 } from "react";
 import { useCustomWallet } from "./WalletContext";
 import { HouseCell, useSocket } from "./SocketContext";
-import { ApiHouseCell, ApiRoomData } from "../types/socket";
+import { ApiRoomData } from "../types/socket";
 import { useParams } from "next/navigation";
 import { PlayerState } from "@/types/game";
 import { initializeDefaultPlayers } from "@/utils/gameAdapter";
 
 interface GameContextType {
 	turnAddress: string | null;
-	isTurn: boolean;
+	isTurn: boolean | null;
 	roomData: ApiRoomData | null;
 	messages: string[];
 	playerState: PlayerState | null;
-	houseCell: ApiHouseCell[];
+	hasAction: boolean;
+	handleAction: (action: boolean) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -45,13 +46,17 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 	const { address } = useCustomWallet();
 
 	const [turnAddress, setTurnAddress] = useState<string | null>(null);
-	const [isTurn, setIsTurn] = useState<boolean>(false);
+	const [isTurn, setIsTurn] = useState<boolean | null>(null);
 	const [roomData, setRoomData] = useState<ApiRoomData | null>(null);
 	const [messages, setMessages] = useState<string[]>([]);
 	const [playerState, setPlayerState] = useState<PlayerState | null>(null);
-	const [houseCell, setHouseCell] = useState<ApiHouseCell[]>([]);
+	const [hasAction, setHasAction] = useState<boolean>(false);
 
 	const { roomId } = useParams<{ roomId: string }>();
+
+	const handleAction = useCallback((action: boolean) => {
+		setHasAction(action);
+	}, []);
 
 	// 定義每個事件處理器為 useCallback 函數
 	const handleGameState = useCallback(
@@ -59,7 +64,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 			console.log("gameState", data);
 			if (!data) return;
 			setRoomData(data.gameState);
-			setHouseCell(data.gameState.houseCell);
 			const players = initializeDefaultPlayers(data.gameState);
 			const selectedPlayer = players.find(
 				(player) => player.address === address
@@ -106,21 +110,22 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 	const handleActionRequest = useCallback((data: any) => {
 		console.log("ActionRequest", data);
 		if (!data.player) return;
-
+		if (data.player === address) {
+			setHasAction(true);
+		}
 		setMessages((prevMessages) => [
 			...prevMessages,
 			`${data.player.slice(0, 5)}... action request`,
 		]);
 	}, []);
 
-	// TODO: 等後端改完要改回來
 	const handleBuy = useCallback(
 		(data: {
 			player: string;
 			purchased: boolean;
 			houseCell: HouseCell;
 		}) => {
-			if (!data.player) return;
+			if (!data.player || !data.purchased) return;
 			console.log("Buy", data);
 			const level = data.houseCell.level;
 			const price = data.houseCell.buyPrice[level - 1].price;
@@ -198,6 +203,10 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 				setTimeout(() => {
 					socket.emit("gameState", { roomId });
 				}, 2000);
+
+				setTimeout(() => {
+					socket.emit("ChangeTurn", { roomId });
+				}, 3000);
 			} else {
 				setTimeout(checkSocketAndSendRequests, 1000);
 			}
@@ -242,7 +251,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		roomData,
 		messages,
 		playerState,
-		houseCell,
+		hasAction,
+		handleAction,
 	};
 
 	return (

@@ -576,10 +576,7 @@ class MonopolyScene extends Phaser.Scene {
 				(p) => p.state.address === player
 			);
 			if (playerIndex === -1) return;
-			console.log("playerIndex", playerIndex);
-			// TODO: 等後端改完要改回來
-			const nextPlayerIndex = (playerIndex + 1) % this.players.length;
-			const nextPlayer = this.players[nextPlayerIndex];
+			const nextPlayer = this.players[playerIndex];
 
 			// 平滑過渡到新的玩家
 			this.cameras.main.pan(
@@ -597,6 +594,11 @@ class MonopolyScene extends Phaser.Scene {
 		});
 
 		this.socket.on("Buy", ({ player, purchased, houseCell }) => {
+			if (!purchased) {
+				this.isBuying = false;
+				this.socket.emit("ChangeTurn", { roomId: this.roomId });
+				return;
+			}
 			const pos = HOUSE_POSITIONS[houseCell.position];
 			const playerIndex = this.players.findIndex(
 				(p) => p.state.address === player

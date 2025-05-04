@@ -13,13 +13,11 @@ import { MessageSquare, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IoClose } from "react-icons/io5";
 import { FaComment } from "react-icons/fa";
+import { useGame } from "@/contexts/GameContext";
 
-interface GameStatusProps {
-	messages: string[];
-}
-
-const StatusDialog: React.FC<GameStatusProps> = ({ messages }) => {
+const StatusDialog: React.FC = () => {
 	const [isOpen, setIsOpen] = useState(true); // 添加 isOpen 状态
+	const { messages } = useGame();
 
 	// 如果折叠，只显示图标按钮
 	if (!isOpen) {

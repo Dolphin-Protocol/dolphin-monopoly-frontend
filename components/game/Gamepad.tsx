@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { PlayerState } from "@/types/game";
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -11,7 +10,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Home, Coins, MapPin, Dice5 } from "lucide-react";
+import { Coins, MapPin, Dice5 } from "lucide-react";
 import { IoClose } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import Dice from "react-dice-roll";
@@ -19,19 +18,16 @@ import { useRollDice } from "@/hooks/game/useRollDice";
 import { useBuyHouse } from "@/hooks/game/useBuyHouse";
 import getPlayerColor from "@/utils/utils";
 import PLAYER_COLORS from "@/constants/colors";
-
-interface GamepadProps {
-	playerState: PlayerState | null;
-	isTurn: boolean;
-}
+import { useGame } from "@/contexts/GameContext";
 
 // 骰子邏輯以及按鈕顯示
-const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
+const Gamepad: React.FC = () => {
 	const [diceValue, setDiceValue] = useState<number | null>(null);
-	const [isOpen, setIsOpen] = useState(true); // 添加 isOpen 状态
+	const [isOpen, setIsOpen] = useState(true);
 	const diceRef = useRef<any>(null);
 	const { rollDice, isLoading } = useRollDice();
 	const { executeBuy } = useBuyHouse();
+	const { hasAction, playerState, isTurn, handleAction } = useGame();
 
 	const handleRollClick = async () => {
 		if (isLoading || !diceRef.current) return;
@@ -58,8 +54,14 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 		}
 	};
 
-	const handleBuyHouse = () => {
-		executeBuy(true);
+	const handleBuyHouse = async () => {
+		await executeBuy(true);
+		handleAction(false);
+	};
+
+	const handleSkip = async () => {
+		await executeBuy(false);
+		handleAction(false);
 	};
 
 	const playerColor = playerState
@@ -68,7 +70,6 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 
 	if (!playerState) return null;
 
-	// 添加折叠状态的渲染
 	if (!isOpen) {
 		return (
 			<div className="absolute top-4 right-4 z-50">
@@ -105,7 +106,6 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 						>
 							Player {playerState.playerIndex}
 						</Badge>
-						{/* 添加关闭按钮 */}
 						<Button
 							variant="outline"
 							size="icon"
@@ -150,46 +150,64 @@ const Gamepad: React.FC<GamepadProps> = ({ playerState, isTurn }) => {
 					</Badge>
 				</div>
 
-				<div className="flex justify-center py-3 bg-gradient-to-r from-background via-muted/20 to-background rounded-xl my-2">
-					<Dice
-						ref={diceRef}
-						size={60}
-						rollingTime={3500}
-						cheatValue={
-							diceValue as 1 | 2 | 3 | 4 | 5 | 6 | undefined
-						}
-						faces={[
-							"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-one.svg",
-							"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-two.svg",
-							"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-three.svg",
-							"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-four.svg",
-							"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-five.svg",
-							"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-six.svg",
-						]}
-					/>
-				</div>
+				{isTurn && !hasAction && (
+					<div className="flex justify-center py-3 bg-gradient-to-r from-background via-muted/20 to-background rounded-xl my-2">
+						<Dice
+							ref={diceRef}
+							size={60}
+							rollingTime={3500}
+							cheatValue={
+								diceValue as 1 | 2 | 3 | 4 | 5 | 6 | undefined
+							}
+							faces={[
+								"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-one.svg",
+								"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-two.svg",
+								"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-three.svg",
+								"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-four.svg",
+								"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-five.svg",
+								"https://game-icons.net/icons/ffffff/000000/1x1/delapouite/dice-six-faces-six.svg",
+							]}
+						/>
+					</div>
+				)}
 			</CardContent>
 
 			<CardFooter className="pt-0 flex flex-col gap-2">
-				<Button
-					onClick={handleRollClick}
-					variant="default"
-					size="lg"
-					className="w-full relative overflow-hidden group"
-					disabled={isLoading}
-				>
-					<span className="absolute inset-0 w-full h-full bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 group-hover:translate-x-full transition-transform duration-700 ease-in-out -z-10" />
-					<Dice5 className="mr-2 h-5 w-5" />
-					{isLoading ? "Connecting..." : "Roll Dice"}
-				</Button>
-				<Button
-					onClick={handleBuyHouse}
-					variant="default"
-					size="lg"
-					className="w-full"
-				>
-					buy house
-				</Button>
+				{isTurn && !hasAction && (
+					<Button
+						onClick={handleRollClick}
+						variant="default"
+						size="lg"
+						className="w-full relative overflow-hidden group"
+						disabled={isLoading}
+					>
+						<span className="absolute inset-0 w-full h-full bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 group-hover:translate-x-full transition-transform duration-700 ease-in-out -z-10" />
+						<Dice5 className="mr-2 h-5 w-5" />
+						{isLoading ? "Connecting..." : "Roll Dice"}
+					</Button>
+				)}
+				{ (
+					<div className="flex items-center justify-center gap-2">
+						<Button
+							onClick={handleBuyHouse}
+							variant="action"
+							size="lg"
+							className="w-full"
+							disabled={hasAction}
+						>
+							Buy House
+						</Button>
+						<Button
+							onClick={handleSkip}
+							variant="cancel"
+							size="lg"
+							className="w-full"
+							disabled={hasAction}
+						>
+							Skip
+						</Button>
+					</div>
+				)}
 			</CardFooter>
 		</Card>
 	);

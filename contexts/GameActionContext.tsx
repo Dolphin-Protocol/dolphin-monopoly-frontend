@@ -95,7 +95,6 @@ export const GameActionProvider = ({ children }: { children: ReactNode }) => {
 		[suiClient, game, address]
 	);
 
-	// 通過ID獲取遊戲
 	const fetchGameById = useCallback(
 		async (gameId: string) => {
 			if (!gameId) {
