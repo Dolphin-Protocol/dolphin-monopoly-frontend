@@ -10,7 +10,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Coins, MapPin, Dice5 } from "lucide-react";
+import { Coins, MapPin, Dice5, User } from "lucide-react";
 import { IoClose } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import Dice from "react-dice-roll";
@@ -19,6 +19,7 @@ import { useBuyHouse } from "@/hooks/game/useBuyHouse";
 import getPlayerColor from "@/utils/utils";
 import PLAYER_COLORS from "@/constants/colors";
 import { useGame } from "@/contexts/GameContext";
+import { toast } from "sonner";
 
 // Define the type based on the type definition
 type DiceRef = {
@@ -127,6 +128,27 @@ const Gamepad: React.FC = () => {
 			</CardHeader>
 
 			<CardContent className="space-y-3 pb-3">
+				<div className="flex items-center justify-between bg-muted/30 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+					<div
+						className="flex items-center gap-2 cursor-pointer"
+						onClick={() => {
+							navigator.clipboard.writeText(playerState.address);
+							toast.success("Address copied to clipboard");
+						}}
+					>
+						<div className="bg-primary/10 p-1.5 rounded-md">
+							<User className="h-4 w-4 text-primary" />
+						</div>
+						<span className="text-sm font-medium">Address</span>
+					</div>
+					<Badge
+						variant="outline"
+						className="bg-background/80 font-mono"
+					>
+						{playerState.address.slice(0, 6)}...
+						{playerState.address.slice(-4)}
+					</Badge>
+				</div>
 				<div className="flex items-center justify-between bg-muted/30 p-2 rounded-lg hover:bg-muted/50 transition-colors">
 					<div className="flex items-center gap-2">
 						<div className="bg-primary/10 p-1.5 rounded-md">
