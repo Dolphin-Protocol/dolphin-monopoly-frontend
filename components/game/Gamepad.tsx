@@ -215,7 +215,7 @@ const Gamepad: React.FC = () => {
 						{isLoading ? "Connecting..." : "Roll Dice"}
 					</Button>
 				)}
-				<div className="flex items-center justify-center gap-2">
+				<div className="flex items-center justify-center gap-2 w-full">
 					<Button
 						onClick={handleBuyHouse}
 						variant="action"
