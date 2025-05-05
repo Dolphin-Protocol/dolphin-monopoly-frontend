@@ -159,16 +159,17 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 			payee: string;
 			level: number;
 		}) => {
+			console.log("PayHouseToll", data);
 			if (!data.player) return;
-			const price = data.houseCell.rentPrice[data.level - 1].price;
+			const amountToChange = data.paidAmount;	
 
 			if (data.player === address) {
-			setPlayerState((prev) => {
-				if (!prev) return null;
-				return {
-					...prev,
-					assets: prev.assets - Number(price),
-				};
+				setPlayerState((prev) => {
+					if (!prev) return null;
+					return {
+						...prev,
+						assets: prev.assets - amountToChange,
+					};
 				});
 			}
 
@@ -177,16 +178,16 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 					if (!prev) return null;
 					return {
 						...prev,
-						assets: prev.assets + Number(price),
+						assets: prev.assets + amountToChange,
 					};
 				});
 			}
 			setMessages((prevMessages) => [
 				...prevMessages,
-				`${data.player.slice(0, 5)}... pay rent for ${price}`,
+				`${data.player.slice(0, 5)}... pay rent for ${amountToChange} to ${data.payee}`,
 			]);
 		},
-		[]
+		[address]
 	);
 
 	const handleError = useCallback((data: any) => {
