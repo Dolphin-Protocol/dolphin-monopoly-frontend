@@ -570,6 +570,7 @@ class MonopolyScene extends Phaser.Scene {
 
 		this.socket.on("ChangeTurn", ({ player }) => {
 			console.log("收到換人事件:", player);
+			if (!this.hasInitializedHouses || !this.hasInitializedPlayers) return;
 			if (this.isBuying || this.isMoving) return;
 			this.currentPlayerAddress = player;
 			const playerIndex = this.players.findIndex(

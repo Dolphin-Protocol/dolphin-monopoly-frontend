@@ -29,8 +29,6 @@ export type HouseCell = {
 	rentPrice: Price[];
 };
 
-
-
 interface ServerToClientEvents {
 	rooms: (data: { rooms: Room[] }) => void;
 	roomCreated: (data: Room) => void;
