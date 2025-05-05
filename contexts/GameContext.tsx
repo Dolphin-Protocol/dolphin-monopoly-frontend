@@ -161,7 +161,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		}) => {
 			console.log("PayHouseToll", data);
 			if (!data.player) return;
-			const amountToChange = data.paidAmount;	
+			const amountToChange = data.paidAmount ?? 0;	
 
 			if (data.player === address) {
 				setPlayerState((prev) => {
@@ -184,7 +184,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 			}
 			setMessages((prevMessages) => [
 				...prevMessages,
-				`${data.player.slice(0, 5)}... pay rent for ${amountToChange} to ${data.payee}`,
+				`${data.player.slice(0, 5)}... pay rent for ${amountToChange} to ${data.payee.slice(0, 5)}...`,
 			]);
 		},
 		[address]
