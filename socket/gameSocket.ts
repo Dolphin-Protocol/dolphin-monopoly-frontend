@@ -1,7 +1,7 @@
 import { Room } from "@/types/game";
 import { io, Socket } from "socket.io-client";
 
-const SOCKET_URL = "http://5.183.11.9:3003"; 
+const SOCKET_URL = "https://5.183.11.9:3003"; 
 
 interface ServerToClientEvents {
 	rooms: (data: { rooms: Room[] }) => void;
