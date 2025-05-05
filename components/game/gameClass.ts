@@ -39,6 +39,7 @@ class MonopolyScene extends Phaser.Scene {
 	isBuying: boolean = false;
 	hasInitializedPlayers: boolean = false;
 	hasInitializedHouses: boolean = false;
+	isInitialized: boolean = false;
 	rounds: number = 0;
 
 	constructor(socket: Socket, roomId: string, rounds: number) {
@@ -54,6 +55,7 @@ class MonopolyScene extends Phaser.Scene {
 		this.hasInitializedPlayers = false;
 		this.hasInitializedHouses = false;
 		this.rounds = rounds;
+		this.isInitialized = false;
 	}
 
 	preload() {
@@ -256,8 +258,9 @@ class MonopolyScene extends Phaser.Scene {
 				});
 
 				this.createAnimations();
-				this.setupSocketListeners();
 				this.setupControl();
+				this.setupSocketListeners();
+				this.isInitialized = true;
 			}
 		} catch (error) {
 			console.error("Create 錯誤:", error);
@@ -546,6 +549,7 @@ class MonopolyScene extends Phaser.Scene {
 	setupSocketListeners() {
 		this.socket.on("Move", ({ player, position }) => {
 			console.log("收到骰子事件:", player, position);
+			if (!this.isInitialized) return;
 			this.isMoving = true;
 
 			const playerIndex = this.players.findIndex(
@@ -565,11 +569,13 @@ class MonopolyScene extends Phaser.Scene {
 
 		this.socket.on("ActionRequest", ({ player, houseCell }) => {
 			console.log("收到行動要求:", player, houseCell);
+			if (!this.isInitialized) return;
 			this.isBuying = true;
 		});
 
 		this.socket.on("ChangeTurn", ({ player }) => {
 			console.log("收到換人事件:", player);
+			if (!this.isInitialized) return;
 			if (!this.hasInitializedHouses || !this.hasInitializedPlayers) return;
 			if (this.isBuying || this.isMoving) return;
 			this.currentPlayerAddress = player;
@@ -595,6 +601,7 @@ class MonopolyScene extends Phaser.Scene {
 		});
 
 		this.socket.on("Buy", ({ player, purchased, houseCell }) => {
+			if (!this.isInitialized) return;
 			if (!purchased) {
 				this.isBuying = false;
 				this.socket.emit("ChangeTurn", { roomId: this.roomId });
