@@ -83,7 +83,7 @@ class MonopolyScene extends Phaser.Scene {
 			"Darker_Soil_Ground_Tiles",
 			"/maps/Darker_Soil_Ground_Tiles.png"
 		);
-		this.load.image("Grass_Tile_layers", "/maps/Grass_Tile_layers.png");
+		this.load.image("Grass_Tile_layers", "/maps/Grass_Tile_Layers.png");
 		this.load.image(
 			"Darker_Grass_Hills_Tiles_v2",
 			"/maps/Darker_Grass_Hills_Tiles_v2.png"
