@@ -202,33 +202,27 @@ class MonopolyScene extends Phaser.Scene {
 					StoneGroundHillsTileset,
 					DarkerSoilGroundTileset,
 				]);
-				map.createLayer(
-					"background_items",
-					[
-						WaterObjectsTileset,
-						WoodenBridgeTileset,
-						WoodenBridgeV2Tileset,
-						GrassTileLayersTileset,
-						GrassTileLayers2Tileset,
-						ChickenHousesTileset,
-						BasicFurnitureTileset,
-						DarkerGrassHillsTileset,
-						DarkerSoilGroundTileset,
-						StoneGroundHillsTileset,
-						SoilGroundHiIlsTileset,
-						GrassHillTileset,
-					]
-				);
-				 map.createLayer("grass", [
+				map.createLayer("background_items", [
+					WaterObjectsTileset,
+					WoodenBridgeTileset,
+					WoodenBridgeV2Tileset,
+					GrassTileLayersTileset,
+					GrassTileLayers2Tileset,
+					ChickenHousesTileset,
+					BasicFurnitureTileset,
+					DarkerGrassHillsTileset,
+					DarkerSoilGroundTileset,
+					StoneGroundHillsTileset,
+					SoilGroundHiIlsTileset,
+					GrassHillTileset,
+				]);
+				map.createLayer("grass", [
 					GrassTileLayersTileset,
 					GrassTileLayers2Tileset,
 					GrassHillTileset,
 					DarkerGrassHillsTileset,
 				]);
-				map.createLayer(
-					"houses",
-					ChickenHousesTileset
-				);
+				map.createLayer("houses", ChickenHousesTileset);
 
 				const camera = this.cameras.main;
 				camera.setZoom(4);
@@ -524,7 +518,7 @@ class MonopolyScene extends Phaser.Scene {
 		// 上移动
 		upKey.on("down", () => {
 			this.cameras.main.stopFollow();
-			this.cameras.main.scrollY -= moveDistance; 
+			this.cameras.main.scrollY -= moveDistance;
 		});
 
 		// 下移动
@@ -576,7 +570,8 @@ class MonopolyScene extends Phaser.Scene {
 		this.socket.on("ChangeTurn", ({ player }) => {
 			console.log("收到換人事件:", player);
 			if (!this.isInitialized) return;
-			if (!this.hasInitializedHouses || !this.hasInitializedPlayers) return;
+			if (!this.hasInitializedHouses || !this.hasInitializedPlayers)
+				return;
 			if (this.isBuying || this.isMoving) return;
 			this.currentPlayerAddress = player;
 			const playerIndex = this.players.findIndex(
@@ -654,17 +649,17 @@ class MonopolyScene extends Phaser.Scene {
 		onComplete: () => void
 	) {
 		this.cameras.main.startFollow(playerObj.sprite);
-		const currentIndex = playerObj.state.positionIndex;
-		const targetIndex = targetPosition;
-		const steps = targetIndex - currentIndex;
 
-		const moveStep = (step: number) => {
-			const nextIndex = playerObj.state.positionIndex + 1;
-			if (nextIndex >= path.length) {
+		const moveStep = () => {
+			// 如果已經到達目標 index，結束
+			if (playerObj.state.positionIndex === targetPosition) {
+				playerObj.sprite.anims.stop();
 				onComplete();
 				return;
 			}
 
+			// 下一格 index（繞圈）
+			const nextIndex = (playerObj.state.positionIndex + 1) % path.length;
 			const nextPosition = path[nextIndex];
 			playerObj.state.positionIndex = nextIndex;
 			playerObj.state.direction = nextPosition.direction;
@@ -681,17 +676,17 @@ class MonopolyScene extends Phaser.Scene {
 				y: nextPosition.y * tileSize + 8,
 				duration: 300,
 				onComplete: () => {
-					if (step > 1) {
-						moveStep(step - 1);
-					} else {
-						playerObj.sprite.anims.stop();
-						onComplete();
-					}
+					moveStep(); // 繼續走下一格
 				},
 			});
 		};
 
-		moveStep(steps);
+		// 只要目標不是目前位置就開始走
+		if (playerObj.state.positionIndex !== targetPosition) {
+			moveStep();
+		} else {
+			onComplete();
+		}
 	}
 }
 
