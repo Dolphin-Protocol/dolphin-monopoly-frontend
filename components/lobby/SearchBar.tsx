@@ -10,6 +10,7 @@ interface SearchBarProps {
 	onCreateRoom: () => void;
 	isCreatingRoom: boolean;
 	currentRoom: Room | null;
+	isBalanceEnough: boolean;
 }
 
 export function SearchBar({
@@ -18,6 +19,7 @@ export function SearchBar({
 	onCreateRoom,
 	isCreatingRoom,
 	currentRoom,
+	isBalanceEnough,
 }: SearchBarProps) {
 	return (
 		<div className="flex flex-col sm:flex-row gap-4 justify-between">
@@ -36,7 +38,7 @@ export function SearchBar({
 				<Button
 					className="w-full sm:w-auto"
 					onClick={onCreateRoom}
-					disabled={isCreatingRoom || !!currentRoom}
+					disabled={isCreatingRoom || !!currentRoom || !isBalanceEnough}
 				>
 					{isCreatingRoom ? (
 						<>

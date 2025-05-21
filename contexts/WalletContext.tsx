@@ -81,7 +81,6 @@ export const CustomWalletContext = createContext<CustomWalletContextProps>({
 	jwt: undefined,
 	emailAddress: null,
 	getAddressSeed: async () => "",
-	// 更新方法名稱
 	sponsorAndExecuteTransaction: async () => {
 		throw new Error("Not implemented");
 	},

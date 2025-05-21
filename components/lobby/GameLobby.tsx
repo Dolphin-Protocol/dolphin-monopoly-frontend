@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLobby } from "@/hooks/game/useLobby";
 import { LobbyHeader } from "./LobbyHeader";
 import { SearchBar } from "./SearchBar";
 import { RoomList } from "./RoomList";
 import { useCustomWallet } from "@/contexts/WalletContext";
 import { toast } from "sonner";
-
+import { useSuiClient } from "@mysten/dapp-kit";
 export default function GameLobby() {
   const { address } = useCustomWallet();
 
@@ -26,6 +26,8 @@ export default function GameLobby() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
+  const suiClient = useSuiClient();
+  const [suiBalance, setSuiBalance] = useState<string | null>(null);
 
   // Filter and search rooms
   const filteredRooms = serverRooms.filter((room) => {
@@ -95,9 +97,23 @@ export default function GameLobby() {
     }
   };
 
+  const isBalanceEnough = suiBalance !== null && Number(suiBalance) >= 100000000;
+
+  useEffect(() => {
+		if (!address) return;
+		suiClient
+			.getBalance({ owner: address, coinType: "0x2::sui::SUI" })
+			.then((res) => setSuiBalance(res.totalBalance))
+			.catch(() => setSuiBalance(null));
+  }, [address, suiClient]);
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-background/80 w-full">
-      <LobbyHeader isConnecting={isConnecting} isConnected={isConnected} />
+      <LobbyHeader
+        isConnecting={isConnecting}
+        isConnected={isConnected}
+        suiBalance={suiBalance}
+      />
 
       <main className="flex-1 py-6 w-full px-4">
         <div className="flex flex-col gap-6">
@@ -107,6 +123,7 @@ export default function GameLobby() {
             onCreateRoom={handleCreateRoom}
             isCreatingRoom={isCreatingRoom}
             currentRoom={currentRoom}
+            isBalanceEnough={isBalanceEnough}
           />
 
           <RoomList
@@ -119,6 +136,7 @@ export default function GameLobby() {
             currentRoom={currentRoom}
             onStartGame={handleStartGame}
             isGameStarting={isGameStarting}
+            isBalanceEnough={isBalanceEnough}
           />
         </div>
       </main>

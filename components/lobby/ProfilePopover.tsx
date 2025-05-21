@@ -18,19 +18,19 @@ import { useCustomWallet } from "@/contexts/WalletContext";
 import { ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export default function ProfilePopover() {
+interface ProfilePopoverProps {
+	suiBalance: string | null;
+}
+
+export default function ProfilePopover({ suiBalance }: ProfilePopoverProps) {
 	const { isConnected, logout, redirectToAuthUrl, emailAddress, address } =
 		useCustomWallet();
-
-	// Add a loading state to handle initial SSR render
 	const [isLoading, setIsLoading] = useState(true);
 
-	// Use effect to update loading state after first client render
 	useEffect(() => {
 		setIsLoading(false);
 	}, []);
 
-	// Show simple loading state during SSR and initial hydration
 	if (isLoading) {
 		return (
 			<Button size="sm" variant="secondary">
@@ -75,6 +75,16 @@ export default function ProfilePopover() {
 											<ExternalLink width={14} />
 										</a>
 									</div>
+								</div>
+								<div className="flex flex-row items-center justify-between p-2 rounded-lg bg-muted/50 mt-2">
+									<span className="text-sm font-medium text-muted-foreground">
+										SUI Balance:
+									</span>
+									<span className="font-mono text-sm">
+										{suiBalance !== null
+											? Number(suiBalance) / 1e9
+											: "Loading..."}
+									</span>
 								</div>
 							</>
 						</CardContent>

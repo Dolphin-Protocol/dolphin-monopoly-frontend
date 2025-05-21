@@ -15,6 +15,7 @@ interface RoomListProps {
   onLeaveRoom: (roomId: string) => void;
   onStartGame: () => void;
   isGameStarting: boolean;
+  isBalanceEnough: boolean;
 }
 
 export function RoomList({
@@ -27,6 +28,7 @@ export function RoomList({
   currentRoom,
   onStartGame,
   isGameStarting,
+  isBalanceEnough,
 }: RoomListProps) {
   const { isConnected: isWalletConnected } = useCustomWallet();
 
@@ -87,6 +89,7 @@ export function RoomList({
             isCurrentRoom={room.roomId === currentRoom?.roomId}
             hasJoinedRoom={!!currentRoom}
             isGameStarting={isGameStarting}
+            isBalanceEnough={isBalanceEnough}
           />
         ))
       ) : (

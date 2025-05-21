@@ -23,6 +23,7 @@ interface RoomCardProps {
   onLeave: (roomId: string) => void;
   onStartGame: () => void;
   isGameStarting: boolean;
+  isBalanceEnough: boolean;
 }
 
 export function RoomCard({
@@ -33,6 +34,7 @@ export function RoomCard({
   onLeave,
   onStartGame,
   isGameStarting,
+  isBalanceEnough,
 }: RoomCardProps) {
   const { address } = useCustomWallet();
   const isHost = room.members.find((m) => m.isCreator)?.address === address;
@@ -101,13 +103,14 @@ export function RoomCard({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="pt-2 flex justify-between">
-        <Badge variant="outline">{room.members.length} Players</Badge>
-        <div className="flex gap-2">
+      {isBalanceEnough ? (
+        <CardFooter className="pt-2 flex justify-between">
+          <Badge variant="outline">{room.members.length} Players</Badge>
+          <div className="flex gap-2">
           {(isHost || isGameStarting) && (
             <Button
               variant="default"
-              disabled={!canStartGame || isGameStarting}
+              disabled={!canStartGame || isGameStarting || !isBalanceEnough}
               size="sm"
               onClick={() => onStartGame()}
             >
@@ -138,6 +141,14 @@ export function RoomCard({
           )}
         </div>
       </CardFooter>
+      ) : (
+        <CardFooter className="pt-2 flex justify-between">
+          <Badge variant="outline">{room.members.length} Players</Badge>
+          <Button variant="destructive" size="sm" disabled>
+            Not enough SUI, please send 1 SUI to the wallet
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 }
