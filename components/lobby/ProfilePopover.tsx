@@ -15,7 +15,6 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { useCustomWallet } from "@/contexts/WalletContext";
-import { ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 interface ProfilePopoverProps {
