@@ -5,7 +5,6 @@ import { ConnectionStatus } from "./ConnectionStatus";
 import ProfilePopover from "./ProfilePopover";
 import { useCustomWallet } from "@/contexts/WalletContext";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 interface LobbyHeaderProps {
 	isConnecting: boolean;
@@ -22,19 +21,7 @@ export function LobbyHeader({
 
 	const handleFaucet = async () => {
 		if (!address) return;
-		try {
-			const res = await fetch("https://faucet.testnet.sui.io/v1/gas", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					FixedAmountRequest: { recipient: address },
-				}),
-			});
-			if (!res.ok) throw new Error("Faucet request failed");
-			toast.success("SUI Faucet received, please wait for balance update!");
-		} catch (e) {
-			toast.error("SUI Faucet failed: " + (e as Error).message);
-		}
+		window.open("https://faucet.sui.io/?network=testnet");
 	};
 
 	return (
