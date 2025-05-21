@@ -12,19 +12,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { IoClose } from "react-icons/io5";
 import { useGame } from "@/contexts/GameContext";
-import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 const GameClosedDialog: React.FC = () => {
-	const { isGameClosed, gameClosedData, handleFinishGame } = useGame();
-	const { roomId } = useParams<{ roomId: string }>();
+	const { isGameClosed, gameClosedData, handleFinishGame, roomData } = useGame();
+
 	const router = useRouter();
 	const handleClose = () => {
 		handleFinishGame();
 		router.push("/");
 	};
 
-	if (!isGameClosed || !gameClosedData || roomId !== gameClosedData.game)
+	if (!isGameClosed || !gameClosedData || roomData?.roomInfo.gameId !== gameClosedData.game)
 		return null;
 
 	return (

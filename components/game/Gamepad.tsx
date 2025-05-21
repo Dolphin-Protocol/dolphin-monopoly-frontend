@@ -203,38 +203,38 @@ const Gamepad: React.FC = () => {
 
 			<CardFooter className="pt-0 flex flex-col gap-2">
 				{isTurn && !hasAction && (
-					<Button
-						onClick={handleRollClick}
-						variant="default"
-						size="lg"
-						className="w-full relative overflow-hidden group"
-						disabled={isLoading}
-					>
-						<span className="absolute inset-0 w-full h-full bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 group-hover:translate-x-full transition-transform duration-700 ease-in-out -z-10" />
-						<Dice5 className="mr-2 h-5 w-5" />
-						{isLoading ? "Connecting..." : "Roll Dice"}
-					</Button>
+					<>
+						<Button
+							onClick={handleRollClick}
+							variant="default"
+							size="lg"
+							className="w-full relative overflow-hidden group"
+							disabled={isLoading}
+						>
+							<span className="absolute inset-0 w-full h-full bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 group-hover:translate-x-full transition-transform duration-700 ease-in-out -z-10" />
+							<Dice5 className="mr-2 h-5 w-5" />
+							{isLoading ? "Connecting..." : "Roll Dice"}
+						</Button>
+					</>
 				)}
-				<div className="flex items-center justify-center gap-2 w-full">
-					<Button
-						onClick={handleBuyHouse}
-						variant="action"
-						size="lg"
-						className="w-full"
-						disabled={isBuying}
-					>
-						Buy / Upgrade House
-					</Button>
-					<Button
-						onClick={handleSkip}
-						variant="cancel"
-						size="lg"
-						className="w-full"
-						disabled={isBuying}
-					>
-						Skip
-					</Button>
-				</div>
+				<Button
+					onClick={handleBuyHouse}
+					variant="action"
+					size="lg"
+					className="w-full"
+					disabled={isBuying}
+				>
+					Buy / Upgrade House
+				</Button>
+				<Button
+					onClick={handleSkip}
+					variant="cancel"
+					size="lg"
+					className="w-full"
+					disabled={isBuying}
+				>
+					Skip
+				</Button>
 			</CardFooter>
 		</Card>
 	);
