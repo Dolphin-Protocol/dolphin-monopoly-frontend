@@ -49,6 +49,8 @@ interface ServerToClientEvents {
 		payee: string;
 		level: number;
 	}) => void;
+	GameClosed: (data: { roomId: string }) => void;
+	BalanceUpdated: (data: { owner: string; value: string }) => void;
 }
 
 interface ClientToServerEvents {

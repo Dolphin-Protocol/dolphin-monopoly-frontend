@@ -51,7 +51,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 	const [messages, setMessages] = useState<string[]>([]);
 	const [playerState, setPlayerState] = useState<PlayerState | null>(null);
 	const [hasAction, setHasAction] = useState<boolean>(false);
-
+	const [isGameClosed, setIsGameClosed] = useState<boolean>(false);
 	const { roomId } = useParams<{ roomId: string }>();
 
 	const handleAction = useCallback((action: boolean) => {
@@ -130,16 +130,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 			const level = data.houseCell.level;
 			const price = data.houseCell.buyPrice[level - 1].price;
 
-			if (data.purchased && data.player === address) {
-				setPlayerState((prev) => {
-					if (!prev) return null;
-					return {
-						...prev,
-						assets: prev.assets - Number(price),
-					};
-				});
-			}
-
 			setMessages((prevMessages) => [
 				...prevMessages,
 				`${data.player.slice(
@@ -161,27 +151,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		}) => {
 			console.log("PayHouseToll", data);
 			if (!data.player) return;
-			const amountToChange = data.paidAmount ?? 0;	
+			const amountToChange = data.paidAmount ?? 0;
 
-			if (data.player === address) {
-				setPlayerState((prev) => {
-					if (!prev) return null;
-					return {
-						...prev,
-						assets: prev.assets - amountToChange,
-					};
-				});
-			}
-
-			if (data.payee === address) {
-				setPlayerState((prev) => {
-					if (!prev) return null;
-					return {
-						...prev,
-						assets: prev.assets + amountToChange,
-					};
-				});
-			}
 			setMessages((prevMessages) => [
 				...prevMessages,
 				`${data.player.slice(0, 5)}... pay rent for ${amountToChange} to ${data.payee.slice(0, 5)}...`,
@@ -189,6 +160,23 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		},
 		[address]
 	);
+
+	const handleBalanceUpdated = useCallback((data: {owner: string, value: string}) => {
+		console.log("BalanceUpdated", data);
+		if (data.owner === address) {
+			setPlayerState((prev) => {
+				if (!prev) return null;
+				return {
+					...prev,
+					assets: Number(data.value),
+				};
+			});
+		}
+	}, []);
+
+	const handleGameClosed = useCallback((data: any) => {
+		console.log("GameClosed", data);
+	}, []);
 
 	const handleError = useCallback((data: any) => {
 		console.error("Socket error:", data.message);
@@ -222,6 +210,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		socket.on("ActionRequest", handleActionRequest);
 		socket.on("Buy", handleBuy);
 		socket.on("PayHouseToll", handlePayHouseToll);
+		socket.on("BalanceUpdated", handleBalanceUpdated);
+		socket.on("GameClosed", handleGameClosed);
 		socket.on("error", handleError);
 
 		return () => {
@@ -232,6 +222,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 			socket.off("ActionRequest", handleActionRequest);
 			socket.off("Buy", handleBuy);
 			socket.off("PayHouseToll", handlePayHouseToll);
+			socket.off("GameClosed", handleGameClosed);
+			socket.off("BalanceUpdated", handleBalanceUpdated);
 			socket.off("error", handleError);
 		};
 	}, [
@@ -243,6 +235,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		handleActionRequest,
 		handleBuy,
 		handlePayHouseToll,
+		handleBalanceUpdated,
+		handleGameClosed,
 		handleError,
 	]);
 
@@ -253,6 +247,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		messages,
 		playerState,
 		hasAction,
+		isGameClosed,
 		handleAction,
 	};
 
