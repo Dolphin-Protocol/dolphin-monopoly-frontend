@@ -223,7 +223,7 @@ const Gamepad: React.FC = () => {
 						className="w-full"
 						disabled={isBuying}
 					>
-						Buy House
+						Buy / Upgrade House
 					</Button>
 					<Button
 						onClick={handleSkip}

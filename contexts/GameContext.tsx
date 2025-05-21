@@ -22,7 +22,10 @@ interface GameContextType {
 	messages: string[];
 	playerState: PlayerState | null;
 	hasAction: boolean;
+	isGameClosed: boolean;
+	gameClosedData: { game: string; winners: string[] } | null;
 	handleAction: (action: boolean) => void;
+	handleFinishGame: () => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -52,13 +55,16 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 	const [playerState, setPlayerState] = useState<PlayerState | null>(null);
 	const [hasAction, setHasAction] = useState<boolean>(false);
 	const [isGameClosed, setIsGameClosed] = useState<boolean>(false);
+	const [gameClosedData, setGameClosedData] = useState<{
+		game: string;
+		winners: string[];
+	} | null>(null);
 	const { roomId } = useParams<{ roomId: string }>();
 
 	const handleAction = useCallback((action: boolean) => {
 		setHasAction(action);
 	}, []);
 
-	// 定義每個事件處理器為 useCallback 函數
 	const handleGameState = useCallback(
 		(data: any) => {
 			console.log("gameState", data);
@@ -138,7 +144,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 				)}... buy/upgrade house for ${price} to level ${level}`,
 			]);
 		},
-		[address]
+		[]
 	);
 
 	const handlePayHouseToll = useCallback(
@@ -155,31 +161,52 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
 			setMessages((prevMessages) => [
 				...prevMessages,
-				`${data.player.slice(0, 5)}... pay rent for ${amountToChange} to ${data.payee.slice(0, 5)}...`,
+				`${data.player.slice(
+					0,
+					5
+				)}... pay rent for ${amountToChange} to ${data.payee.slice(
+					0,
+					5
+				)}...`,
 			]);
+		},
+		[]
+	);
+
+	const handleBalanceUpdated = useCallback(
+		(data: { owner: string; value: string }) => {
+			console.log("BalanceUpdated", data);
+			if (data.owner === address) {
+				setPlayerState((prev) => {
+					if (!prev) return null;
+					return {
+						...prev,
+						assets: Number(data.value),
+					};
+				});
+			}
 		},
 		[address]
 	);
 
-	const handleBalanceUpdated = useCallback((data: {owner: string, value: string}) => {
-		console.log("BalanceUpdated", data);
-		if (data.owner === address) {
-			setPlayerState((prev) => {
-				if (!prev) return null;
-				return {
-					...prev,
-					assets: Number(data.value),
-				};
-			});
-		}
-	}, []);
-
-	const handleGameClosed = useCallback((data: any) => {
-		console.log("GameClosed", data);
-	}, []);
+	const handleGameClosed = useCallback(
+		(data: { game: string; winners: string[] }) => {
+			console.log("GameClosed", data);
+			if (data.game === roomId) {
+				setIsGameClosed(true);
+				setGameClosedData(data);
+			}
+		},
+		[]
+	);
 
 	const handleError = useCallback((data: any) => {
 		console.error("Socket error:", data.message);
+	}, []);
+
+	const handleFinishGame = useCallback(() => {
+		setIsGameClosed(false);
+		setGameClosedData(null);
 	}, []);
 
 	// 主要 useEffect 只負責設置和清除事件監聽器
@@ -248,7 +275,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		playerState,
 		hasAction,
 		isGameClosed,
+		gameClosedData,
 		handleAction,
+		handleFinishGame,
 	};
 
 	return (

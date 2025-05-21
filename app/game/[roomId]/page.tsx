@@ -4,12 +4,12 @@ import PhaserGame from "@/components/game/PhaserGame";
 import GameControlHelp from "@/components/game/GameControlHelp";
 import Gamepad from "@/components/game/Gamepad";
 import StatusDialog from "@/components/game/StatusDialog";
+import GameClosedDialog from "@/components/game/GameClosedDialog";
 import { useSocket } from "@/contexts/SocketContext";
 import { useParams } from "next/navigation";
 import { useGameActionContext } from "@/contexts/GameActionContext";
 
 export default function GamePage() {
-	
 	const { rounds } = useGameActionContext();
 	const { socket } = useSocket();
 	const { roomId } = useParams<{ roomId: string }>();
@@ -20,6 +20,7 @@ export default function GamePage() {
 			<GameControlHelp />
 			<Gamepad />
 			<StatusDialog />
+			<GameClosedDialog />
 		</div>
 	);
 }
