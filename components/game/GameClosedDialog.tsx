@@ -17,6 +17,10 @@ import { useRouter } from "next/navigation";
 const GameClosedDialog: React.FC = () => {
 	const { isGameClosed, gameClosedData, handleFinishGame, roomData } = useGame();
 
+	console.log("isGameClosed", isGameClosed);
+	console.log("gameClosedData", gameClosedData);
+	console.log("roomData", roomData);
+
 	const router = useRouter();
 	const handleClose = () => {
 		handleFinishGame();
@@ -52,7 +56,7 @@ const GameClosedDialog: React.FC = () => {
 							variant="outline"
 							className="font-mono text-xs px-2 py-1"
 						>
-							{gameClosedData.game}
+							{gameClosedData.game.slice(0, 6)}...{gameClosedData.game.slice(-4)}
 						</Badge>
 					</div>
 					<div className="flex flex-col items-center gap-2">

@@ -193,11 +193,12 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 		(data: { game: string; winners: string[] }) => {
 			console.log("GameClosed", data);
 			if (data.game === roomData?.roomInfo.gameId) {
+				console.log("run");
 				setIsGameClosed(true);
 				setGameClosedData(data);
 			}
 		},
-		[]
+		[roomData?.roomInfo.gameId]
 	);
 
 	const handleError = useCallback((data: any) => {
